@@ -1,0 +1,2425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-78TGK2PLXS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-78TGK2PLXS');
+</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AHPRA Registration Progress Tracker</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
+      background: #f0f4fb;
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+      font-size: 16px;
+      color: #1a2340;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    /* HEADER */
+    .header {
+      background: linear-gradient(135deg, #1a3a6b 0%, #2563eb 100%);
+      color: #fff;
+      text-align: center;
+      padding: 20px 20px 16px;
+      padding-top: calc(20px + env(safe-area-inset-top));
+    }
+    .header h1 { font-size: 19px; font-weight: 700; letter-spacing: 0.3px; }
+    .header p  { font-size: 13px; opacity: 0.85; margin-top: 4px; }
+
+    /* CARD */
+    .card {
+      background: #fff;
+      max-width: 580px;
+      margin: 16px auto;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(37,99,235,0.10);
+      padding: 20px 16px 24px;
+    }
+
+    /* PAGE TITLES */
+    .page-title { font-size: 17px; font-weight: 700; color: #1a3a6b; margin-bottom: 6px; }
+    .page-sub   { font-size: 13px; color: #5a6a85; margin-bottom: 20px; line-height: 1.5; }
+
+    /* LOGIN */
+    .login-input {
+      width: 100%; padding: 15px 16px; border: 1.5px solid #d0d9f0; border-radius: 12px;
+      font-size: 16px; color: #1a2340; background: #f8faff; margin-bottom: 10px;
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
+    }
+    .login-input:focus { outline: none; border-color: #2563eb; background: #fff; }
+    .login-error { font-size: 13px; color: #dc2626; margin-bottom: 12px; min-height: 18px; }
+
+    /* BUTTONS */
+    .btn-row { display: flex; gap: 10px; }
+    .btn {
+      flex: 1; padding: 16px 12px; border: none; border-radius: 12px;
+      font-size: 15px; font-weight: 700; cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+      min-height: 52px;
+      -webkit-appearance: none;
+    }
+    .btn:active { transform: scale(0.97); opacity: 0.9; }
+    .btn-primary   { background: #2563eb; color: #fff; }
+    .btn-primary:disabled { background: #9ca3af; cursor: not-allowed; }
+    .btn-secondary { background: #e5e7eb; color: #374151; }
+    .btn-success   { background: #059669; color: #fff; }
+
+    /* ADMIN PANEL */
+    #admin-panel { display: none; }
+    .admin-note { background: #fef9c3; border: 1px solid #fde68a; border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #92400e; margin-bottom: 18px; line-height: 1.5; }
+    .admin-candidate-select {
+      width: 100%; padding: 13px 14px; border: 1.5px solid #d0d9f0; border-radius: 10px;
+      font-size: 16px; margin-bottom: 18px; background: #f8faff; color: #1a2340;
+      -webkit-appearance: none; appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235a6a85' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 40px;
+    }
+
+    /* ADMIN STAGE ROWS — stacked layout for mobile */
+    .stage-row { border-bottom: 1px solid #f0f4ff; }
+    .stage-row:last-child { border-bottom: none; }
+    .stage-row-main { display: flex; flex-direction: column; padding: 12px 0 8px; gap: 8px; }
+    .stage-label { font-size: 14px; font-weight: 600; color: #1a3a6b; }
+    .stage-controls { display: flex; gap: 8px; align-items: center; width: 100%; }
+    .stage-select {
+      flex: 1; padding: 10px 10px; border: 1.5px solid #d0d9f0; border-radius: 8px;
+      font-size: 14px; background: #f8faff; color: #1a2340; cursor: pointer;
+      -webkit-appearance: none; appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235a6a85' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      padding-right: 32px;
+      min-height: 44px;
+    }
+    .stage-select.status-notstarted { border-color: #d0d9f0; background-color: #f8faff; }
+    .stage-select.status-inprogress { border-color: #f59e0b; background-color: #fffbeb; color: #92400e; }
+    .stage-select.status-completed  { border-color: #10b981; background-color: #f0fdf4; color: #065f46; }
+    .stage-date-input {
+      padding: 10px 8px; border: 1.5px solid #d0d9f0; border-radius: 8px;
+      font-size: 14px; background: #f8faff; color: #1a2340; cursor: pointer;
+      width: 140px; flex-shrink: 0; min-height: 44px;
+      -webkit-appearance: none;
+    }
+    .stage-date-input:focus { outline: none; border-color: #2563eb; }
+
+    .sub-stage-block { background: #f4f8ff; border-left: 3px solid #93b3e8; border-radius: 0 8px 8px 0; margin: 0 0 12px 12px; padding: 4px 8px 4px 12px; }
+    .sub-stage-row { display: flex; flex-direction: column; padding: 10px 0; border-bottom: 1px solid #e4ecfa; gap: 8px; }
+    .sub-stage-row:last-child { border-bottom: none; }
+    .sub-stage-label { font-size: 13px; font-weight: 500; color: #374151; }
+    .sub-stage-label::before { content: "↳ "; color: #93b3e8; font-weight: 700; }
+
+    /* PROGRESS VIEW */
+    #progress-page { display: none; }
+    .candidate-banner {
+      background: linear-gradient(90deg, #1a3a6b, #2563eb);
+      color: #fff; border-radius: 12px; padding: 14px 16px;
+      margin-bottom: 20px; display: flex; align-items: center; gap: 12px;
+    }
+    .avatar { width: 46px; height: 46px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; flex-shrink: 0; }
+    .candidate-banner h2 { font-size: 16px; font-weight: 700; }
+    .candidate-banner p  { font-size: 12px; opacity: 0.85; margin-top: 2px; line-height: 1.4; }
+
+    /* ADMIN BADGE in banner */
+    .admin-badge { display: inline-block; background: rgba(255,255,255,0.25); border: 1px solid rgba(255,255,255,0.5); border-radius: 99px; font-size: 10px; font-weight: 700; padding: 2px 8px; margin-left: 6px; vertical-align: middle; }
+
+    /* VERTICAL TRACK */
+    .progress-track { position: relative; padding: 0 0 0 16px; }
+    .progress-track::before { content: ''; position: absolute; left: 27px; top: 18px; bottom: 18px; width: 3px; background: #e5e7eb; border-radius: 3px; z-index: 0; }
+    .stage-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; position: relative; z-index: 1; }
+    .stage-dot { width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0; border: 3px solid #d1d5db; background: #fff; position: relative; z-index: 2; transition: all 0.3s; margin-top: 1px; }
+    .stage-dot.dot-notstarted { border-color: #d1d5db; background: #fff; }
+    .stage-dot.dot-inprogress { border-color: #f59e0b; background: #fef3c7; box-shadow: 0 0 0 4px rgba(245,158,11,0.15); }
+    .stage-dot.dot-completed  { border-color: #10b981; background: #10b981; }
+    .stage-dot.dot-completed::after { content: '✓'; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); color: #fff; font-size: 12px; font-weight: 700; }
+    .stage-info { flex: 1; min-width: 0; }
+    .stage-header-row { display: flex; align-items: center; gap: 5px; }
+    .stage-header-row.clickable { cursor: pointer; min-height: 44px; align-items: center; }
+    .stage-header-row.clickable:active .stage-name { color: #2563eb; }
+    .stage-name { font-size: 15px; font-weight: 600; color: #1a3a6b; }
+    .expand-arrow { font-size: 11px; color: #2563eb; flex-shrink: 0; transition: transform 0.2s; user-select: none; margin-left: 2px; }
+    .expand-arrow.open { transform: rotate(90deg); }
+    .stage-badge { display: inline-block; margin-top: 4px; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; }
+    .badge-notstarted { background: #f3f4f6; color: #6b7280; }
+    .badge-inprogress { background: #fef3c7; color: #b45309; }
+    .badge-completed  { background: #d1fae5; color: #065f46; }
+    .stage-date-label { font-size: 11px; color: #8a99b5; margin-top: 4px; display: flex; align-items: center; gap: 4px; }
+    .stage-date-label span { font-weight: 600; color: #5a6a85; }
+
+    .substage-panel { display: none; margin-top: 8px; background: #f4f8ff; border-left: 3px solid #93b3e8; border-radius: 0 8px 8px 0; padding: 6px 10px 4px 12px; animation: fadeIn 0.18s ease; }
+    .substage-panel.open { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+    .substage-item { display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px solid #e4ecfa; }
+    .substage-item:last-child { border-bottom: none; }
+    .substage-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; margin-top: 2px; border: 2px solid #d1d5db; background: #fff; position: relative; }
+    .substage-dot.dot-notstarted { border-color: #d1d5db; background: #fff; }
+    .substage-dot.dot-inprogress { border-color: #f59e0b; background: #fef3c7; }
+    .substage-dot.dot-completed  { border-color: #10b981; background: #10b981; }
+    .substage-dot.dot-completed::after { content: '✓'; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); color: #fff; font-size: 8px; font-weight: 700; }
+    .substage-info { flex: 1; }
+    .substage-name  { font-size: 13px; font-weight: 600; color: #374151; line-height: 1.4; }
+    .substage-badge { display: inline-block; margin-top: 3px; padding: 2px 8px; border-radius: 99px; font-size: 11px; font-weight: 700; }
+    .substage-date-label { font-size: 11px; color: #8a99b5; margin-top: 2px; }
+    .substage-date-label span { font-weight: 600; color: #5a6a85; }
+    .substage-chip { display: inline-flex; align-items: center; gap: 3px; background: #e0ebff; color: #2563eb; border-radius: 99px; font-size: 11px; font-weight: 700; padding: 3px 10px; margin-left: 4px; vertical-align: middle; cursor: pointer; user-select: none; }
+    .stage-number { width: 20px; text-align: center; padding-top: 4px; font-size: 11px; font-weight: 700; color: #9ca3af; flex-shrink: 0; }
+
+    /* SUMMARY */
+    .summary-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 18px; }
+    .summary-pill { text-align: center; border-radius: 12px; padding: 12px 6px; font-size: 12px; font-weight: 700; }
+    .pill-total    { background: #e0ebff; color: #1a3a6b; }
+    .pill-done     { background: #d1fae5; color: #065f46; }
+    .pill-progress { background: #fef3c7; color: #92400e; }
+    .pill-pending  { background: #f3f4f6; color: #6b7280; }
+    .summary-pill span { display: block; font-size: 22px; font-weight: 800; margin-bottom: 2px; }
+
+    .overall-bar-wrap  { margin-bottom: 20px; }
+    .overall-bar-label { font-size: 13px; font-weight: 600; color: #5a6a85; margin-bottom: 6px; }
+    .overall-bar-track { background: #e5e7eb; border-radius: 99px; height: 12px; overflow: hidden; }
+    .overall-bar-fill  { height: 100%; background: linear-gradient(90deg, #2563eb, #10b981); border-radius: 99px; transition: width 0.6s; }
+
+    .divider   { height: 1px; background: #e5e7eb; margin: 20px 0; }
+    .back-row  { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+    .small-btn { padding: 11px 18px; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; min-height: 44px; }
+    .small-btn-outline { border: 1.5px solid #2563eb; background: #fff; color: #2563eb; }
+    .small-btn-fill    { background: #2563eb; color: #fff; }
+    .footer-note { text-align: center; font-size: 12px; color: #9ca3af; margin-top: 16px; }
+
+
+    /* PAYMENT ENTRIES */
+    .payment-section { margin-top: 24px; border-top: 2px dashed #d0d9f0; padding-top: 18px; }
+    .payment-section-title { font-size: 12px; font-weight: 700; color: #9ca3af; letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 12px; }
+    .payment-item { background: #f8faff; border: 1.5px solid #d0d9f0; border-radius: 12px; padding: 14px 14px 10px; margin-bottom: 12px; }
+    .payment-item-compact { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 8px 0; border-bottom: 1px solid #e5e7eb; }
+    .payment-item-compact:last-child { border-bottom: none; }
+    .payment-item-label { font-size: 13px; font-weight: 600; color: #1a3a6b; flex-shrink: 0; }
+    .payment-inline-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+    .payment-inline-detail { font-size: 12px; color: #5a6a85; white-space: nowrap; }
+    .payment-item-title { font-size: 14px; font-weight: 700; color: #1a3a6b; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+    .payment-fields { display: flex; flex-direction: column; gap: 8px; }
+    .payment-field-row { display: flex; flex-direction: column; gap: 4px; }
+    .payment-field-label { font-size: 11px; font-weight: 600; color: #5a6a85; }
+    .payment-select {
+      width: 100%; padding: 9px 10px; border: 1.5px solid #d0d9f0; border-radius: 8px;
+      font-size: 14px; background: #f8faff; color: #1a2340; cursor: default;
+      -webkit-appearance: none; appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235a6a85' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 10px center; padding-right: 32px;
+      min-height: 40px;
+    }
+    .payment-select.editable { cursor: pointer; }
+    .payment-select.pay-notstarted { border-color: #d0d9f0; background-color: #f8faff; }
+    .payment-select.pay-pending    { border-color: #f59e0b; background-color: #fffbeb; color: #92400e; }
+    .payment-select.pay-paid       { border-color: #10b981; background-color: #f0fdf4; color: #065f46; }
+    .payment-date-input {
+      padding: 9px 8px; border: 1.5px solid #d0d9f0; border-radius: 8px;
+      font-size: 14px; background: #f8faff; color: #1a2340;
+      width: 100%; min-height: 40px; -webkit-appearance: none;
+    }
+    .payment-date-input:focus { outline: none; border-color: #2563eb; }
+    .payment-badge { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; margin-top: 2px; }
+    .pay-badge-notstarted { background: #f3f4f6; color: #6b7280; }
+    .pay-badge-pending    { background: #fef3c7; color: #b45309; }
+    .pay-badge-paid       { background: #d1fae5; color: #065f46; }
+    .payment-view-row { display: flex; flex-direction: column; gap: 3px; margin-top: 2px; }
+    .payment-view-detail { font-size: 12px; color: #5a6a85; display: flex; align-items: center; gap: 4px; }
+    .payment-view-detail span { font-weight: 600; color: #1a3a6b; }
+    @media (min-width: 600px) {
+      .payment-fields { flex-direction: row; flex-wrap: wrap; }
+      .payment-field-row { flex: 1; min-width: 140px; }
+    }
+
+    @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 4px rgba(245,158,11,0.15); } 50% { box-shadow: 0 0 0 8px rgba(245,158,11,0.08); } }
+    .stage-dot.dot-inprogress { animation: pulse 2s infinite; }
+
+    /* CLOUD SETTINGS MODAL */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5); z-index: 999;
+      align-items: flex-end; justify-content: center;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .modal-box {
+      background: #fff;
+      border-radius: 20px 20px 0 0;
+      padding: 24px 20px;
+      padding-bottom: calc(24px + env(safe-area-inset-bottom));
+      width: 100%;
+      max-width: 560px;
+      box-shadow: 0 -8px 40px rgba(0,0,0,0.2);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal-label { font-size: 14px; font-weight: 600; color: #1a3a6b; display: block; margin-bottom: 6px; }
+    .modal-input {
+      width: 100%; padding: 12px 14px; border: 1.5px solid #d0d9f0; border-radius: 10px;
+      font-size: 14px; margin-bottom: 12px; font-family: monospace;
+      -webkit-appearance: none; min-height: 48px;
+    }
+    .modal-status { font-size: 13px; min-height: 20px; margin-bottom: 14px; }
+    .modal-btn-row { display: flex; gap: 10px; }
+    .modal-btn { flex: 1; padding: 14px; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; min-height: 50px; }
+    .modal-btn-cancel { border: 1.5px solid #d0d9f0; background: #fff; color: #374151; }
+    .modal-btn-primary { border: none; background: #2563eb; color: #fff; }
+
+    /* Admin selector on progress page */
+    .admin-select-wrap { margin-bottom: 16px; }
+    .admin-select-label { font-size: 13px; font-weight: 600; color: #1a3a6b; margin-bottom: 6px; display: block; }
+
+    /* Larger tap area for desktop on small screens */
+    @media (min-width: 600px) {
+      .card { margin: 24px auto; padding: 28px 24px 32px; }
+      .summary-bar { grid-template-columns: repeat(4, 1fr); }
+      .stage-row-main { flex-direction: row; align-items: center; padding: 10px 0; }
+      .stage-controls { width: auto; }
+      .stage-select { flex: none; }
+      .sub-stage-row { flex-direction: row; align-items: center; padding: 7px 0; }
+      .modal-overlay { align-items: center; padding-bottom: 0; }
+      .modal-box { border-radius: 16px; max-width: 420px; padding: 28px 24px; }
+    }
+
+    /* PAYMENT SUMMARY MODAL */
+    #pay-summary-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.55); z-index: 1000;
+      align-items: flex-start; justify-content: center;
+      padding: 16px;
+      overflow-y: auto;
+    }
+    #pay-summary-overlay.open { display: flex; }
+    .pay-summary-box {
+      background: #fff;
+      border-radius: 18px;
+      padding: 24px 18px 28px;
+      width: 100%;
+      max-width: 760px;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.22);
+      margin: auto;
+    }
+    .pay-summary-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .pay-summary-title {
+      font-size: 17px; font-weight: 800; color: #1a3a6b;
+    }
+    .pay-summary-close {
+      background: #f0f4fb; border: none; border-radius: 50%;
+      width: 34px; height: 34px; font-size: 18px; cursor: pointer;
+      color: #5a6a85; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: background 0.15s;
+    }
+    .pay-summary-close:hover { background: #dde6f7; }
+    .pay-summary-sub {
+      font-size: 12px; color: #8a99b5; margin-bottom: 18px;
+    }
+
+    /* Table wrapper for horizontal scroll on mobile */
+    .pay-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 10px; }
+    .pay-table {
+      width: 100%; border-collapse: collapse; font-size: 13px; min-width: 560px;
+    }
+    .pay-table thead tr {
+      background: linear-gradient(90deg, #1a3a6b, #2563eb);
+      color: #fff;
+    }
+    .pay-table thead th {
+      padding: 11px 12px; text-align: left; font-size: 11px; font-weight: 700;
+      letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap;
+    }
+    .pay-table thead th:first-child { border-radius: 10px 0 0 0; }
+    .pay-table thead th:last-child  { border-radius: 0 10px 0 0; }
+    .pay-table tbody tr { border-bottom: 1px solid #eef2fb; transition: background 0.12s; }
+    .pay-table tbody tr:last-child { border-bottom: none; }
+    .pay-table tbody tr:hover { background: #f4f8ff; }
+    .pay-table tbody tr.group-row-gift2 { background: #fafbff; }
+    .pay-table td { padding: 10px 12px; vertical-align: middle; color: #1a2340; }
+    .pay-table td.col-name { font-weight: 700; color: #1a3a6b; white-space: nowrap; }
+    .pay-table td.col-gift { font-size: 12px; color: #5a6a85; font-weight: 600; white-space: nowrap; }
+    .pay-table td.col-amount { font-weight: 700; color: #1a3a6b; white-space: nowrap; }
+    .pay-table td.col-bank { font-size: 12px; color: #374151; }
+    .pay-table td.col-date { font-size: 12px; color: #5a6a85; white-space: nowrap; }
+    .pay-table td.col-empty { color: #c0cce0; font-style: italic; font-size: 12px; }
+
+    /* Status badges inside the table */
+    .tbl-badge { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .tbl-badge-notstarted { background: #f3f4f6; color: #6b7280; }
+    .tbl-badge-pending    { background: #fef3c7; color: #b45309; }
+    .tbl-badge-paid       { background: #d1fae5; color: #065f46; }
+
+    /* Divider between the two gift rows per candidate */
+    .pay-table tr.inner-divider td { border-bottom: 1px dashed #d0d9f0; padding-top: 0; padding-bottom: 0; height: 0; }
+
+    /* Summary totals strip */
+    .pay-totals-strip {
+      display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px;
+    }
+    .pay-totals-pill {
+      flex: 1; min-width: 120px; text-align: center;
+      border-radius: 12px; padding: 12px 8px; font-size: 12px; font-weight: 700;
+    }
+    .ptpill-paid    { background: #d1fae5; color: #065f46; }
+    .ptpill-pending { background: #fef3c7; color: #92400e; }
+    .ptpill-none    { background: #f3f4f6; color: #6b7280; }
+    .pay-totals-pill span { display: block; font-size: 20px; font-weight: 800; margin-bottom: 2px; }
+
+    /* LAST UPDATED STRIP */
+    .last-updated-strip {
+      display: flex; align-items: center; justify-content: space-between;
+      background: #f0f4fb; border: 1px solid #d0d9f0; border-radius: 10px;
+      padding: 9px 14px; margin-bottom: 16px; gap: 8px;
+    }
+    .last-updated-left { display: flex; align-items: center; gap: 7px; flex: 1; min-width: 0; }
+    .last-updated-icon { font-size: 15px; flex-shrink: 0; }
+    .last-updated-text { font-size: 12px; color: #5a6a85; line-height: 1.4; }
+    .last-updated-text strong { color: #1a3a6b; font-weight: 700; }
+    .last-updated-edit {
+      background: none; border: 1px solid #b0bedd; border-radius: 7px;
+      padding: 5px 10px; font-size: 11px; font-weight: 700; color: #2563eb;
+      cursor: pointer; white-space: nowrap; flex-shrink: 0; display: none;
+    }
+    .last-updated-edit:hover { background: #e0ebff; }
+
+    /* EDIT LAST-UPDATED MODAL */
+    #edit-lastupd-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45); z-index: 1100;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    #edit-lastupd-overlay.open { display: flex; }
+    .edit-lastupd-box {
+      background: #fff; border-radius: 16px; padding: 24px 20px 20px;
+      width: 100%; max-width: 340px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    }
+    .edit-lastupd-title { font-size: 15px; font-weight: 800; color: #1a3a6b; margin-bottom: 14px; }
+    .edit-lastupd-label { font-size: 12px; font-weight: 600; color: #5a6a85; margin-bottom: 5px; }
+    .edit-lastupd-input {
+      width: 100%; padding: 10px 12px; border: 1.5px solid #d0d9f0; border-radius: 9px;
+      font-size: 15px; color: #1a2340; background: #f8faff; margin-bottom: 16px;
+      -webkit-appearance: none;
+    }
+    .edit-lastupd-input:focus { outline: none; border-color: #2563eb; }
+    .edit-lastupd-btns { display: flex; gap: 10px; }
+    .edit-lastupd-btns button { flex: 1; padding: 12px; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; min-height: 44px; }
+    .btn-lastupd-save   { background: #2563eb; color: #fff; }
+    .btn-lastupd-cancel { background: #e5e7eb; color: #374151; }
+
+    /* ── MILESTONE CELEBRATION OVERLAY ── */
+    #milestone-overlay {
+      display: none; position: fixed; inset: 0; z-index: 2000;
+      align-items: center; justify-content: center;
+      padding: 20px;
+      background: rgba(0,0,0,0.0);
+      pointer-events: none;
+    }
+    #milestone-overlay.open {
+      display: flex; pointer-events: all;
+      animation: milestoneBackdrop 0.4s ease forwards;
+    }
+    @keyframes milestoneBackdrop {
+      from { background: rgba(0,0,0,0); }
+      to   { background: rgba(0,0,0,0.6); }
+    }
+
+    .milestone-box {
+      background: #fff; border-radius: 24px;
+      padding: 36px 28px 28px; width: 100%; max-width: 360px;
+      text-align: center; position: relative; overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      animation: milestonePopIn 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    }
+    @keyframes milestonePopIn {
+      from { opacity: 0; transform: scale(0.6) translateY(40px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* tier colours */
+    .milestone-box.tier-0 { border-top: 6px solid #2563eb; background: linear-gradient(160deg, #eff6ff 0%, #fff 60%); }
+    .milestone-box.tier-1 { border-top: 6px solid #10b981; }
+    .milestone-box.tier-2 { border-top: 6px solid #f59e0b; }
+    .milestone-box.tier-3 {
+      border-top: 6px solid #f59e0b;
+      background: linear-gradient(160deg, #fffbeb 0%, #fff 60%);
+    }
+
+    .milestone-emoji {
+      font-size: 64px; line-height: 1; margin-bottom: 12px;
+      animation: milestoneEmoji 0.7s 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    @keyframes milestoneEmoji {
+      from { transform: scale(0) rotate(-20deg); opacity: 0; }
+      to   { transform: scale(1) rotate(0deg);   opacity: 1; }
+    }
+
+    .milestone-tag {
+      display: inline-block; border-radius: 99px; padding: 4px 14px;
+      font-size: 11px; font-weight: 800; letter-spacing: 0.8px;
+      text-transform: uppercase; margin-bottom: 10px;
+    }
+    .tier-0 .milestone-tag { background: #dbeafe; color: #1e40af; }
+    .tier-1 .milestone-tag { background: #d1fae5; color: #065f46; }
+    .tier-2 .milestone-tag { background: #fef3c7; color: #92400e; }
+    .tier-3 .milestone-tag { background: linear-gradient(90deg,#fbbf24,#f59e0b); color: #fff; }
+
+    .milestone-title {
+      font-size: 22px; font-weight: 900; color: #1a2340;
+      margin-bottom: 10px; line-height: 1.25;
+    }
+    .tier-3 .milestone-title { color: #92400e; }
+
+    .milestone-msg {
+      font-size: 14px; color: #5a6a85; line-height: 1.6; margin-bottom: 22px;
+    }
+    .milestone-name {
+      color: #1a3a6b; font-weight: 700;
+    }
+
+    .milestone-close {
+      width: 100%; padding: 14px; border: none; border-radius: 12px;
+      font-size: 15px; font-weight: 800; cursor: pointer; min-height: 50px;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .milestone-close:active { transform: scale(0.97); opacity: 0.85; }
+    .tier-0 .milestone-close { background: linear-gradient(90deg, #2563eb, #1d4ed8); color: #fff; }
+    .tier-1 .milestone-close { background: #10b981; color: #fff; }
+    .tier-2 .milestone-close { background: #f59e0b; color: #fff; }
+    .tier-3 .milestone-close {
+      background: linear-gradient(90deg, #f59e0b, #ef4444);
+      color: #fff; font-size: 16px;
+    }
+
+    /* shimmer strip behind tier-3 box */
+    .milestone-shimmer {
+      display: none; position: absolute; inset: 0; border-radius: 24px;
+      background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%);
+      background-size: 200% 100%;
+      animation: shimmerMove 2s 0.6s infinite;
+      pointer-events: none;
+    }
+    .tier-3 .milestone-shimmer { display: block; }
+    @keyframes shimmerMove {
+      from { background-position: 200% center; }
+      to   { background-position: -200% center; }
+    }
+
+    /* CONFETTI CANVAS */
+    #confetti-canvas {
+      display: none; position: fixed; inset: 0;
+      width: 100%; height: 100%;
+      pointer-events: none; z-index: 1999;
+    }
+    #confetti-canvas.active { display: block; }
+
+    /* ── MOTIVATIONAL MESSAGE ── */
+    .motiv-strip {
+      border-radius: 14px; padding: 14px 16px;
+      margin-bottom: 16px; display: flex; align-items: center; gap: 12px;
+      animation: motivFadeIn 0.5s ease both;
+    }
+    @keyframes motivFadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    /* colour themes per tier */
+    .motiv-0   { background: #f0f4fb; border: 1.5px solid #d0d9f0; }
+    .motiv-1   { background: #f0fdf4; border: 1.5px solid #6ee7b7; }
+    .motiv-2   { background: #f0fdf4; border: 1.5px solid #6ee7b7; }
+    .motiv-3   { background: #fffbeb; border: 1.5px solid #fde68a; }
+    .motiv-4   { background: #fffbeb; border: 1.5px solid #fde68a; }
+    .motiv-5   { background: #fff7ed; border: 1.5px solid #fed7aa; }
+    .motiv-6   { background: #fef3c7; border: 1.5px solid #f59e0b; }
+    .motiv-7   { background: #fce7f3; border: 1.5px solid #f9a8d4; }
+    .motiv-100 { background: linear-gradient(120deg,#d1fae5,#e0f2fe); border: 1.5px solid #6ee7b7; }
+
+    .motiv-emoji { font-size: 30px; flex-shrink: 0; line-height: 1; }
+    .motiv-text  { flex: 1; }
+    .motiv-label {
+      font-size: 10px; font-weight: 800; letter-spacing: 0.8px;
+      text-transform: uppercase; margin-bottom: 3px; color: #8a99b5;
+    }
+    .motiv-msg {
+      font-size: 13px; font-weight: 600; color: #1a2340; line-height: 1.5;
+    }
+    .motiv-msg .motiv-name { color: #2563eb; font-weight: 800; }
+
+    /* ── ADMIN DASHBOARD ── */
+    #dashboard-page { display: none; }
+
+    .dash-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 18px; flex-wrap: wrap; gap: 10px;
+    }
+    .dash-title { font-size: 18px; font-weight: 900; color: #1a3a6b; }
+    .dash-subtitle { font-size: 12px; color: #8a99b5; margin-top: 2px; }
+
+    /* stat pills row */
+    .dash-stats {
+      display: grid; grid-template-columns: repeat(4,1fr);
+      gap: 8px; margin-bottom: 20px;
+    }
+    .dash-stat {
+      border-radius: 12px; padding: 12px 8px; text-align: center;
+      font-size: 11px; font-weight: 700;
+    }
+    .dash-stat span { display: block; font-size: 22px; font-weight: 900; margin-bottom: 2px; }
+    .ds-total    { background: #e0ebff; color: #1a3a6b; }
+    .ds-done     { background: #d1fae5; color: #065f46; }
+    .ds-progress { background: #fef3c7; color: #92400e; }
+    .ds-pending  { background: #f3f4f6; color: #374151; }
+
+    /* Clickable stat pills */
+    .dash-stat {
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+      position: relative;
+    }
+    .dash-stat:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.12); }
+    .dash-stat:active { transform: scale(0.96); }
+    .dash-stat.filter-active { box-shadow: 0 0 0 3px currentColor, 0 4px 14px rgba(0,0,0,0.12); transform: translateY(-2px); }
+    .dash-stat.filter-inactive { opacity: 0.4; }
+
+    /* Filter badge */
+    .dash-filter-bar {
+      display: none; align-items: center; justify-content: space-between;
+      background: #e0ebff; border-radius: 10px; padding: 8px 14px;
+      margin-bottom: 14px; font-size: 13px; font-weight: 700; color: #1a3a6b;
+    }
+    .dash-filter-bar.visible { display: flex; }
+    .dash-filter-clear {
+      background: none; border: 1.5px solid #2563eb; color: #2563eb;
+      border-radius: 8px; padding: 4px 12px; font-size: 12px; font-weight: 700;
+      cursor: pointer;
+    }
+    .dash-filter-clear:hover { background: #2563eb; color: #fff; }
+
+    /* candidate table */
+    .dash-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 12px; border: 1.5px solid #e0e7f4; }
+    .dash-table {
+      width: 100%; border-collapse: collapse; font-size: 14px;
+    }
+    .dash-table thead tr {
+      background: linear-gradient(90deg, #1a3a6b, #2563eb);
+    }
+    .dash-table thead th {
+      color: #fff; font-size: 12px; font-weight: 700; letter-spacing: 0.5px;
+      padding: 12px 14px; text-align: left; white-space: nowrap;
+    }
+    #th-stage:hover { background: rgba(255,255,255,0.12); }
+    .dash-table tbody tr {
+      border-bottom: 1px solid #eef2fb; transition: background 0.15s;
+    }
+    .dash-table tbody tr:last-child { border-bottom: none; }
+    .dash-table tbody tr:hover { background: #f4f8ff; }
+    .dash-table td {
+      padding: 13px 14px; vertical-align: middle;
+    }
+    .dash-td-name { font-weight: 700; color: #1a2340; white-space: nowrap; display: flex; align-items: center; gap: 10px; }
+    .dash-td-stage { color: #374151; font-size: 13px; max-width: 220px; }
+    .dash-td-view a {
+      display: inline-block; padding: 6px 14px;
+      background: #e0ebff; color: #2563eb; border-radius: 8px;
+      font-size: 12px; font-weight: 700; text-decoration: none; white-space: nowrap;
+      transition: background 0.15s;
+    }
+    .dash-td-view a:hover { background: #c7d9fa; }
+
+    /* status dot for table rows */
+    .dash-row-dot {
+      width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+    }
+    .dash-row-dot.dot-done     { background: #10b981; }
+    .dash-row-dot.dot-progress { background: #f59e0b; }
+    .dash-row-dot.dot-pending  { background: #d1d5db; }
+
+    /* keep old card classes referenced in JS but hidden */
+    .dash-card { display: none; }
+    .dash-card-top {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+    }
+    .dash-avatar {
+      width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px; font-weight: 800; color: #fff;
+    }
+    .dash-avatar.av-done     { background: linear-gradient(135deg,#10b981,#059669); }
+    .dash-avatar.av-progress { background: linear-gradient(135deg,#f59e0b,#d97706); }
+    .dash-avatar.av-notstarted { background: linear-gradient(135deg,#9ca3af,#6b7280); }
+
+    .dash-name { font-size: 14px; font-weight: 800; color: #1a2340; line-height: 1.3; }
+    .dash-current-stage {
+      font-size: 11px; color: #5a6a85; margin-top: 2px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px;
+    }
+
+    /* mini progress bar */
+    .dash-bar-wrap { margin-bottom: 10px; }
+    .dash-bar-track { background: #e5e7eb; border-radius: 99px; height: 8px; overflow: hidden; }
+    .dash-bar-fill  { height: 100%; border-radius: 99px; transition: width 0.6s; }
+    .dash-bar-fill.bf-done     { background: linear-gradient(90deg,#10b981,#34d399); }
+    .dash-bar-fill.bf-progress { background: linear-gradient(90deg,#f59e0b,#fbbf24); }
+    .dash-bar-fill.bf-notstarted { background: #d1d5db; }
+    .dash-bar-label {
+      display: flex; justify-content: space-between;
+      font-size: 11px; font-weight: 700; margin-bottom: 4px;
+    }
+    .dash-bar-label span:first-child { color: #5a6a85; }
+    .dash-bar-label span:last-child  { color: #1a3a6b; }
+
+    /* payment chips row */
+    .dash-pay-row { display: flex; gap: 5px; flex-wrap: wrap; }
+    .dash-pay-chip {
+      display: inline-flex; align-items: center; gap: 3px;
+      border-radius: 99px; padding: 3px 9px; font-size: 10px; font-weight: 700;
+      white-space: nowrap;
+    }
+    .dpc-paid       { background: #d1fae5; color: #065f46; }
+    .dpc-pending    { background: #fef3c7; color: #92400e; }
+    .dpc-notstarted { background: #f3f4f6; color: #6b7280; }
+
+    /* view button inside card */
+    .dash-view-btn {
+      position: absolute; top: 14px; right: 12px;
+      background: #f0f4fb; border: none; border-radius: 8px;
+      padding: 5px 10px; font-size: 11px; font-weight: 700; color: #2563eb;
+      cursor: pointer;
+    }
+    .dash-view-btn:hover { background: #dde6f7; }
+
+    /* last-updated small text */
+    .dash-updated { font-size: 10px; color: #b0bedd; margin-top: 8px; }
+
+    /* milestone badge on card */
+    .dash-milestone {
+      position: absolute; bottom: 12px; right: 12px;
+      font-size: 17px; line-height: 1;
+    }
+
+    .btn-dashboard {
+      background: #0e7490; color: #fff;
+      padding: 11px 18px; border: none; border-radius: 10px;
+      font-size: 14px; font-weight: 700; cursor: pointer; min-height: 44px;
+      display: none; white-space: nowrap;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .btn-dashboard:active { transform: scale(0.97); opacity: 0.88; }
+
+    .btn-pay-summary {      background: #7c3aed; color: #fff;
+      padding: 11px 18px; border: none; border-radius: 10px;
+      font-size: 14px; font-weight: 700; cursor: pointer; min-height: 44px;
+      display: none; white-space: nowrap;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .btn-pay-summary:active { transform: scale(0.97); opacity: 0.88; }
+  </style>
+</head>
+
+<body>
+
+<div class="header">
+  <h1>🏥 AHPRA Registration Tracker</h1>
+  <p>Monitor each stage of your AHPRA registration journey</p>
+  <p>A journey through 8 Main stages and 25+ Substages</p>
+</div>
+
+<!-- CLOUD SETTINGS MODAL (admin only) -->
+<div class="modal-overlay" id="settings-overlay" style="display:none;">
+  <div class="modal-box">
+    <h2 style="font-size:17px;font-weight:700;color:#1a3a6b;margin-bottom:6px;">☁ JSONBin Cloud Storage</h2>
+    <p style="font-size:13px;color:#5a6a85;margin-bottom:18px;">Connect so data syncs across all devices for free.</p>
+    <div style="background:#f0f4ff;border-radius:9px;padding:12px 14px;font-size:12px;color:#374151;margin-bottom:18px;line-height:1.7;">
+      <strong>Quick setup (2 min):</strong><br>
+      1. Go to <a href="https://jsonbin.io" target="_blank" style="color:#2563eb;">jsonbin.io</a> → Sign up free<br>
+      2. Click <strong>API Keys</strong> → Create a Master Key<br>
+      3. Paste it below and click <strong>Connect</strong>
+    </div>
+    <label class="modal-label">Master API Key</label>
+    <input id="cfg-apikey" type="password" class="modal-input" placeholder="$2a$10$…" />
+    <label class="modal-label">Bin ID <span style="font-weight:400;color:#9ca3af;">(leave empty on first connect)</span></label>
+    <input id="cfg-binid" type="text" class="modal-input" placeholder="auto-generated on first save" />
+    <div id="cfg-status" class="modal-status"></div>
+    <div class="modal-btn-row">
+      <button class="modal-btn modal-btn-cancel" onclick="closeSettings()">Cancel</button>
+      <button class="modal-btn modal-btn-primary" onclick="connectJsonBin()">Connect ☁</button>
+    </div>
+    <div style="margin-top:12px;padding:12px 14px;background:#fef9c3;border-radius:10px;font-size:12px;color:#92400e;line-height:1.5;">
+      ⚠ Your API key is stored only in your browser's localStorage. Do not share the HTML file with the key visible.
+    </div>
+  </div>
+</div>
+
+<!-- CONFETTI CANVAS -->
+<canvas id="confetti-canvas"></canvas>
+
+<!-- MILESTONE CELEBRATION OVERLAY -->
+<div id="milestone-overlay" onclick="if(event.target===this) closeMilestone()">
+  <div class="milestone-box" id="milestone-box">
+    <div class="milestone-shimmer"></div>
+    <div class="milestone-emoji" id="milestone-emoji">🎉</div>
+    <div class="milestone-tag"  id="milestone-tag">Milestone</div>
+    <div class="milestone-title" id="milestone-title">Well done!</div>
+    <div class="milestone-msg"   id="milestone-msg"></div>
+    <button class="milestone-close" id="milestone-close-btn" onclick="closeMilestone()">🎉 Awesome!</button>
+  </div>
+</div>
+
+<!-- EDIT LAST-UPDATED MODAL (admin only) -->
+<div id="edit-lastupd-overlay" onclick="if(event.target===this) closeEditLastUpdated()">
+  <div class="edit-lastupd-box">
+    <div class="edit-lastupd-title">✏️ Edit Last Updated Date</div>
+    <div class="edit-lastupd-label">Date &amp; Time</div>
+    <input type="datetime-local" class="edit-lastupd-input" id="edit-lastupd-input" />
+    <div class="edit-lastupd-btns">
+      <button class="btn-lastupd-cancel" onclick="closeEditLastUpdated()">Cancel</button>
+      <button class="btn-lastupd-save"   onclick="saveEditLastUpdated()">💾 Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAYMENT SUMMARY MODAL (admin only) -->
+<div id="pay-summary-overlay" onclick="if(event.target===this) closePaySummary()">
+  <div class="pay-summary-box">
+    <div class="pay-summary-header">
+      <div class="pay-summary-title">💳 Summary of Payments</div>
+      <button class="pay-summary-close" onclick="closePaySummary()" title="Close">✕</button>
+    </div>
+    <div class="pay-summary-sub">All payment details for every registered candidate — Gift to Shaji 1 &amp; 2</div>
+    <div class="pay-table-wrap">
+      <table class="pay-table" id="pay-summary-table">
+        <thead>
+          <tr>
+            <th>Candidate</th>
+            <th>Gift</th>
+            <th>Status</th>
+            <th>Amount</th>
+            <th>Bank Account</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody id="pay-summary-tbody"></tbody>
+      </table>
+    </div>
+    <div class="pay-totals-strip" id="pay-totals-strip"></div>
+  </div>
+</div>
+
+<!-- LOADING SCREEN -->
+<div class="card" id="page-loading" style="display:none;text-align:center;padding:48px 24px;">
+  <div style="font-size:32px;margin-bottom:12px;">⏳</div>
+  <div style="font-size:16px;font-weight:700;color:#1a3a6b;margin-bottom:6px;">Loading data…</div>
+  <div style="font-size:13px;color:#5a6a85;">Fetching latest progress from cloud</div>
+</div>
+
+<!-- PAGE: LOGIN -->
+<div class="card" id="page-login">
+  <div class="page-title">👋 Welcome</div>
+  <div class="page-sub">Enter your login code to view your AHPRA registration progress.</div>
+  <input id="login-code" class="login-input" type="password" placeholder="Enter login code…" autocomplete="off"
+    onkeydown="if(event.key==='Enter') doLogin()" oninput="clearLoginError()" />
+  <div class="login-error" id="login-error"></div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="doLogin()">View My Progress →</button>
+  </div>
+  <div style="margin-top:16px;font-size:12px;color:#9ca3af;text-align:center;">Contact your coordinator if you don't have a login code.</div>
+  <p style="margin-top:30px;border-top:1px solid #eee;padding-top:15px;opacity:0.8;line-height:1.8;text-align:center;">
+    <span style="font-size:12px;font-style:italic;display:block;margin-bottom:5px;">
+      A personalized tool to track your AHPRA registration progress
+    </span>
+    <span style="font-size:12px;color:#1f3b57;display:block;">
+      Designed and Developed by: Shaji Sebastian
+    </span>
+  </p>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="card" id="admin-panel">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;gap:10px;">
+    <div class="page-title" style="margin-bottom:0;">⚙ Update Registration Status</div>
+    <button onclick="showSettings()" style="background:rgba(37,99,235,0.08);border:1.5px solid #d0d9f0;color:#2563eb;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;min-height:40px;flex-shrink:0;">☁ Cloud</button>
+  </div>
+  <div class="page-sub">Select a candidate and update each stage status.</div>
+  <div class="admin-note">ℹ Changes are saved to the cloud (JSONBin) and sync across all devices.</div>
+  <div class="admin-select-wrap">
+    <label class="admin-select-label">Candidate</label>
+    <select class="admin-candidate-select" id="admin-candidate-select" onchange="loadAdminStages()">
+      <option value="">-- Select a candidate --</option>
+    </select>
+  </div>
+  <div id="admin-stages"></div>
+  <div class="divider"></div>
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="closeAdmin()">← Back</button>
+    <button class="btn btn-success" onclick="saveStatus()">💾 Save Changes</button>
+  </div>
+</div>
+
+<!-- PAGE: ADMIN DASHBOARD -->
+<div class="card" id="dashboard-page">
+  <div class="dash-topbar">
+    <div>
+      <div class="dash-title">📊 Admin Dashboard</div>
+      <div class="dash-subtitle">All candidates at a glance</div>
+    </div>
+    <button class="small-btn small-btn-outline" onclick="closeDashboard()">← Back</button>
+  </div>
+
+  <!-- Summary stat pills -->
+  <div class="dash-stats">
+    <div class="dash-stat ds-total"    id="pill-all"        onclick="filterDashboard('all')"        title="Show all candidates">   <span id="ds-total">0</span>Candidates</div>
+    <div class="dash-stat ds-done"     id="pill-done"       onclick="filterDashboard('done')"       title="Show fully done candidates">    <span id="ds-done">0</span>Fully Done</div>
+    <div class="dash-stat ds-progress" id="pill-progress"   onclick="filterDashboard('progress')"   title="Show in-progress candidates"><span id="ds-prog">0</span>In Progress</div>
+    <div class="dash-stat ds-pending"  id="pill-notstarted" onclick="filterDashboard('notstarted')" title="Show not started candidates"> <span id="ds-notstarted">0</span>Not Started</div>
+  </div>
+
+  <!-- Active filter indicator -->
+  <div class="dash-filter-bar" id="dash-filter-bar">
+    <span id="dash-filter-label">🔍 Showing: All</span>
+    <button class="dash-filter-clear" onclick="filterDashboard('all')">✕ Clear Filter</button>
+  </div>
+
+  <!-- Candidate table -->
+  <div class="dash-table-wrap">
+    <table class="dash-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th id="th-stage" onclick="sortDashByStage()" style="cursor:pointer;user-select:none;">
+            Current Stage <span id="sort-arrow" style="font-size:11px;margin-left:4px;opacity:0.7;">⇅</span>
+          </th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="dash-grid"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- PAGE: PROGRESS VIEW -->
+<div class="card" id="progress-page">
+  <div class="back-row" id="progress-back-row">
+    <button class="small-btn small-btn-outline" onclick="goBack()">← Logout</button>
+    <button class="small-btn small-btn-outline" id="btn-refresh" onclick="manualRefresh()" title="Refresh status from cloud">🔄 Refresh</button>
+    <!-- Dashboard button shown only to admin -->
+    <button class="btn-dashboard" id="btn-dashboard" onclick="showDashboard()">📊 Dashboard</button>
+    <!-- Payment Summary button shown only to admin -->
+    <button class="btn-pay-summary" id="btn-pay-summary" onclick="showPaySummary()">💳 Payment Summary</button>
+    <!-- Update Status button shown only to admin -->
+    <button class="small-btn small-btn-fill" id="btn-update-status" style="display:none;" onclick="showAdmin()">⚙ Update Status</button>
+  </div>
+  <!-- Admin: candidate picker shown at top of progress page -->
+  <div id="admin-candidate-picker" style="display:none;margin-bottom:16px;">
+    <label class="admin-select-label">Viewing candidate:</label>
+    <select class="admin-candidate-select" id="progress-candidate-select" onchange="onProgressCandidateChange()">
+    </select>
+  </div>
+  <div class="candidate-banner">
+    <div class="avatar" id="candidate-avatar"></div>
+    <div>
+      <h2 id="candidate-name-display"></h2>
+      <p id="candidate-status-summary"></p>
+    </div>
+  </div>
+  <div class="summary-bar">
+    <div class="summary-pill pill-total">   <span id="sum-total">0</span>Total Stages</div>
+    <div class="summary-pill pill-done">    <span id="sum-done">0</span>Completed</div>
+    <div class="summary-pill pill-progress"><span id="sum-prog">0</span>In Progress</div>
+    <div class="summary-pill pill-pending"> <span id="sum-pend">0</span>Not Started</div>
+  </div>
+  <div class="overall-bar-wrap">
+    <div class="overall-bar-label">Overall Completion: <span id="pct-label">0%</span></div>
+    <div class="overall-bar-track"><div class="overall-bar-fill" id="overall-bar" style="width:0%"></div></div>
+    <div style="text-align:center;font-size:12px;font-weight:600;color:#5a6a85;margin-top:6px;">8 Stages and 25+ Substages</div>
+  </div>
+  <!-- Motivational message -->
+  <div id="motiv-strip" class="motiv-strip motiv-0" style="display:none;">
+    <div class="motiv-emoji" id="motiv-emoji">👋</div>
+    <div class="motiv-text">
+      <div class="motiv-label">Your Progress Message</div>
+      <div class="motiv-msg" id="motiv-msg"></div>
+      <button id="motiv-whatsapp-btn" onclick="ReferShaji()" style="display:none;margin-top:10px;width:100%;background:#25d366;color:white;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;min-height:50px;">
+        <span>🟢 Invite friend</span>
+        <span style="font-size:11px;font-weight:400;opacity:0.9;">Your WhatsApp will open automatically.</span>
+      </button>
+    </div>
+  </div>
+  <!-- Last Updated strip -->
+  <div class="last-updated-strip" id="last-updated-strip">
+    <div class="last-updated-left">
+      <span class="last-updated-icon">🕐</span>
+      <div class="last-updated-text">Last updated: <strong id="last-updated-display">—</strong></div>
+    </div>
+    <button class="last-updated-edit" id="btn-edit-lastupd" onclick="openEditLastUpdated()">✏️ Edit</button>
+  </div>
+  <div class="progress-track" id="progress-track"></div>
+  <div class="divider"></div>
+  <div style="text-align:center;border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin-bottom:16px;background:#f8faff;">
+    <p style="font-weight:bold;color:#1f3b57;margin-bottom:12px;font-size:14px;">Are you happy and excited?<br> Invite your friend to join in the WhatsApp group of AHPRA processing RNs</p>
+    <button onclick="ShareWhatsAppGroupLink()" style="width:100%;background:#25d366;color:white;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;min-height:50px;">
+      <span>🟢 Invite friend</span>
+      <span style="font-size:11px;font-weight:400;opacity:0.9;">Your WhatsApp will open automatically.</span>
+    </button>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-secondary" onclick="goBack()">← Logout</button>
+    <button class="btn btn-primary" id="btn-update-status-2" style="display:none;" onclick="showAdmin()">⚙ Update Status</button>
+  </div>
+  <div class="footer-note" id="footer-note">Tap a stage name to expand sub-stages.</div>
+  <p style="margin-top:30px;border-top:1px solid #eee;padding-top:15px;opacity:0.8;line-height:1.8;text-align:center;">
+    <span style="font-size:12px;font-style:italic;display:block;margin-bottom:5px;">
+      A personalized tool to track your AHPRA registration progress
+    </span>
+    <span style="font-size:12px;color:#1f3b57;display:block;">
+      Designed and Developed by: Shaji Sebastian
+    </span>
+  </p>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────
+//  CONFIGURATION — edit these to customise
+// ─────────────────────────────────────────────────────────
+const ADMIN_USERNAME = "shajiadmin"; // <-- secret admin login
+
+// ── ADD NEW CANDIDATES HERE ──────────────────────────────
+// Each candidate needs a unique { name, code } entry.
+// 'name' must match the key used in the admin panel.
+// 'code' is what the candidate types to log in.
+const CANDIDATES = [
+  { name: "Dummy Name",         code: "Dummy123"    },
+  { name: "Neethu Shaji",         code: "Neethu123"    },
+  { name: "Ashiquina Abbas",      code: "Ashiquina123"     },
+    { name: "Aleena Kurian",        code: "Aleena123"     },
+   { name: "Keerthana Benny",      code: "Keerthana123"   },
+   { name: "Merrin Susan Joy",      code: "Merrin123"   },
+  { name: "Liyamol Siby",         code: "Liyamol123"      },
+  { name: "Bibina Eldhose",       code: "Bibina123" },
+  { name: "Babina Oonnukallil Biju",code: "Babina123"    },
+  { name: "Jose K Benny",         code: "Jose123"    },
+];
+// ─────────────────────────────────────────────────────────
+
+const STAGES = [
+  { name: "Self-Check", substages: ["Basic details collection", "AHPRA Login Credential Creation", "Basic Eligibility Check"] },
+  { name: "Orientation Part 1", substages: ["IQNM Fee ($410) Payment to AHPRA", "Candidate takes Orientation Part 1"] },
+  { name: "Portfolio", substages: ["Documents collection", "Portfolio application preparation", "Submit Portfolio", "Waiting for Case Manager's Decision"] },
+  { name: "NCLEX" },
+  { name: "OSCE" },
+  { name: "Final AHPRA Registration Application", substages: [
+    { name: "Fit2Work", subsubstages: ["Fit2Work document collection", "Fit2Work account creation", "Payment to Fit2Work", "Fit2Work Application preparation", "Submit Fit2Work Application", "Waiting for Fit2Work completion"] },
+    { name: "Nursing Council Verification", subsubstages: ["Current country (UK/Ireland etc.) verification", "Other nursing councils' verification"] },
+    { name: "English Language Verification" },
+    { name: "Document collection for the final application" },
+    { name: "Preparing Registration Application" },
+    { name: "Payment to AHPRA ($525)" },
+    { name: "Submit Registration Application" },
+  ]},
+  { name: "ID Verification" },
+  { name: "Got AHPRA Registration", substages: ["Waiting for Case Manager's Decision"] },
+];
+
+const STATUS_LABELS = { notstarted: "Not Started", inprogress: "In Progress", completed: "Completed" };
+
+// ─────────────────────────────────────────────────────────
+//  SESSION STATE
+// ─────────────────────────────────────────────────────────
+let currentUser     = null;  // name typed at login
+let isAdmin         = false; // true if logged in as shajiadmin
+let viewingCandidate = null; // which candidate's data we're showing
+
+// ─────────────────────────────────────────────────────────
+//  CLOUD SETTINGS (JSONBin.io)
+// ─────────────────────────────────────────────────────────
+const PUBLIC_BIN_ID = "69fbd180250b1311c3140682"; // shared bin — all users read from here
+
+const CFG_KEY = "ahpra_jsonbin_cfg";
+function getCfg() { try { return JSON.parse(localStorage.getItem(CFG_KEY) || "{}"); } catch { return {}; } }
+function saveCfg(c) { localStorage.setItem(CFG_KEY, JSON.stringify(c)); }
+
+function showSettings() {
+  const cfg = getCfg();
+  document.getElementById("cfg-apikey").value = cfg.apiKey || "";
+  document.getElementById("cfg-binid").value  = PUBLIC_BIN_ID;
+  document.getElementById("cfg-status").textContent = "";
+  document.getElementById("settings-overlay").style.display = "flex";
+}
+function closeSettings() { document.getElementById("settings-overlay").style.display = "none"; }
+
+async function connectJsonBin() {
+  const apiKey = document.getElementById("cfg-apikey").value.trim();
+  const binId  = PUBLIC_BIN_ID;
+  const statusEl = document.getElementById("cfg-status");
+  if (!apiKey) { statusEl.style.color = "#dc2626"; statusEl.textContent = "❌ Please enter your API key."; return; }
+  statusEl.style.color = "#5a6a85"; statusEl.textContent = "⏳ Connecting…";
+  try {
+    const r = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, { headers: { "X-Master-Key": apiKey } });
+    if (!r.ok) throw new Error("Could not reach bin. Check your API key.");
+    const json = await r.json();
+    saveData(json.record || {});
+    saveCfg({ apiKey, binId });
+    statusEl.style.color = "#059669";
+    statusEl.textContent = "✅ Connected! Data loaded from cloud.";
+  } catch(e) { statusEl.style.color = "#dc2626"; statusEl.textContent = "❌ " + e.message; }
+}
+
+// ─────────────────────────────────────────────────────────
+//  STORAGE
+// ─────────────────────────────────────────────────────────
+const STORAGE_KEY = "ahpra_tracker_v2";
+function loadData() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"); } catch { return {}; } }
+function saveData(d) { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }
+
+
+const PAYMENT_ENTRIES = [
+  { id: "pay1", label: "Gift to Shaji – 1" },
+  { id: "pay2", label: "Gift to Shaji – 2" },
+];
+const PAYMENT_STATUSES = { notstarted: "Not Started", pending: "Pending Payment", paid: "Paid" };
+const PAYMENT_BANKS    = ["UK Monzo a/c", "India Axis NRE a/c", "India Axis NRO a/c"];
+
+function getPayments(name) {
+  const d = loadData()[name] || {};
+  const pays = d.__payments || {};
+  const result = {};
+  PAYMENT_ENTRIES.forEach(e => {
+    result[e.id] = pays[e.id] || { status: "notstarted", amount: "", bank: "", date: "" };
+  });
+  return result;
+}
+
+function savePayments(name, pays) {
+  const d = loadData();
+  if (!d[name]) d[name] = {};
+  d[name].__payments = pays;
+  saveData(d);
+  syncToCloud(d);
+}
+
+function payStatusClass(s) { return s === "paid" ? "pay-paid" : s === "pending" ? "pay-pending" : "pay-notstarted"; }
+function payBadgeClass(s)  { return s === "paid" ? "pay-badge-paid" : s === "pending" ? "pay-badge-pending" : "pay-badge-notstarted"; }
+
+// ── MASTER KEY: embedded so all devices can write to cloud ──
+// Replace the value below with your JSONBin Master Key (jsonbin.io → API Keys)
+const MASTER_KEY = "$2a$10$i34iaNohitGDLh/HWnC/8ui9jmnT9pJHW75IqYfl2KDMbArIDs7mu";
+
+async function syncToCloud(data) {
+  if (!MASTER_KEY || MASTER_KEY === "YOUR_MASTER_KEY_HERE") {
+    console.warn("Cloud sync skipped: MASTER_KEY not set.");
+    return;
+  }
+  try {
+    const r = await fetch(`https://api.jsonbin.io/v3/b/${PUBLIC_BIN_ID}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", "X-Master-Key": MASTER_KEY },
+      body: JSON.stringify(data)
+    });
+    if (!r.ok) console.warn("Cloud sync failed:", r.status);
+  } catch(e) { console.warn("Cloud sync failed:", e.message); }
+}
+
+async function initCloudSync() {
+  const keyToUse = (MASTER_KEY && MASTER_KEY !== "YOUR_MASTER_KEY_HERE")
+    ? MASTER_KEY
+    : "$2a$10$gZraVYCqgxQP2gPTfHJAZumli3qAVQ8M2prBB4em4NpH6NJyr3Eb6";
+  const headerName = (MASTER_KEY && MASTER_KEY !== "YOUR_MASTER_KEY_HERE")
+    ? "X-Master-Key"
+    : "X-Access-Key";
+  try {
+    const r = await fetch(`https://api.jsonbin.io/v3/b/${PUBLIC_BIN_ID}/latest`, {
+      headers: { [headerName]: keyToUse }
+    });
+    if (r.ok) { const json = await r.json(); saveData(json.record || {}); }
+  } catch(e) { console.warn("Cloud load failed:", e.message); }
+}
+
+function getStatusForCandidate(name) {
+  const raw = loadData()[name] || {};
+  const result = {};
+  STAGES.forEach(stage => {
+    const sn = stage.name, old = raw[sn];
+    let mainStatus = "notstarted", mainDate = "";
+    if (typeof old === "string") { mainStatus = old; }
+    else if (old && typeof old === "object") { mainStatus = old.status || "notstarted"; mainDate = old.date || ""; }
+    const entry = { status: mainStatus, date: mainDate };
+    if (stage.substages && stage.substages.length) {
+      entry.substages = {};
+      stage.substages.forEach(subObj => {
+        const subName = typeof subObj === "string" ? subObj : subObj.name;
+        const prev = old && old.substages && old.substages[subName];
+        const subEntry = prev && typeof prev === "object"
+          ? { status: prev.status || "notstarted", date: prev.date || "" }
+          : { status: "notstarted", date: "" };
+        // Handle sub-substages
+        if (typeof subObj === "object" && subObj.subsubstages) {
+          subEntry.subsubstages = {};
+          subObj.subsubstages.forEach(ssub => {
+            const prevSS = prev && prev.subsubstages && prev.subsubstages[ssub];
+            subEntry.subsubstages[ssub] = prevSS && typeof prevSS === "object"
+              ? { status: prevSS.status || "notstarted", date: prevSS.date || "" }
+              : { status: "notstarted", date: "" };
+          });
+        }
+        entry.substages[subName] = subEntry;
+      });
+    }
+    result[sn] = entry;
+  });
+  return result;
+}
+
+function setStatusForCandidate(name, obj) {
+  const d = loadData();
+  // Preserve existing payment data, last-updated timestamp, and milestone flags
+  // so they aren't wiped when saving stage statuses
+  if (d[name] && d[name].__payments)        obj.__payments        = d[name].__payments;
+  if (d[name] && d[name].__lastUpdated)     obj.__lastUpdated     = d[name].__lastUpdated;
+  if (d[name] && d[name].__milestonesShown) obj.__milestonesShown = d[name].__milestonesShown;
+  if (d[name] && d[name].__milestonePending) obj.__milestonePending = d[name].__milestonePending;
+  if (d[name] && d[name].__welcomeShown)    obj.__welcomeShown    = d[name].__welcomeShown;
+  d[name] = obj;
+  saveData(d);
+  syncToCloud(d);
+}
+
+async function manualRefresh() {
+  const btn = document.getElementById("btn-refresh");
+  if (btn) { btn.textContent = "⏳ Refreshing..."; btn.disabled = true; }
+  await initCloudSync();
+  showProgress();
+  if (btn) { btn.textContent = "✅ Updated!"; btn.disabled = false; }
+  setTimeout(() => { if (btn) btn.textContent = "🔄 Refresh"; }, 2000);
+}
+
+// ─────────────────────────────────────────────────────────
+//  LOGIN
+// ─────────────────────────────────────────────────────────
+async function doLogin() {
+  const code = document.getElementById("login-code").value.trim();
+  if (!code) { showLoginError("Please enter your login code."); return; }
+
+  // Admin login
+  if (code.toLowerCase() === ADMIN_USERNAME.toLowerCase()) {
+    isAdmin = true;
+    currentUser = ADMIN_USERNAME;
+    viewingCandidate = CANDIDATES[0].name;
+    gtag('event', 'Tracker_Admin_Login', { user_type: 'admin' });
+    await enterApp();
+    return;
+  }
+
+  // Candidate login — match against each candidate's unique code (case-insensitive)
+  const match = CANDIDATES.find(c => c.code.toLowerCase() === code.toLowerCase());
+  if (!match) {
+    showLoginError("Login code not recognised. Please check and try again.");
+    return;
+  }
+  gtag('event', 'Tracker_User_Login', {user_type: 'candidate', candidate_name: match.name   // tells you WHO logged in
+      });
+
+  isAdmin = false;
+  currentUser = match.name;
+  viewingCandidate = match.name;
+  await enterApp();
+
+}
+
+function showLoginError(msg) { document.getElementById("login-error").textContent = msg; }
+function clearLoginError()   { document.getElementById("login-error").textContent = ""; }
+
+
+async function enterApp() {
+  hide("page-login");
+  document.getElementById("login-code").value = "";
+
+  // Always fetch the latest data from cloud before showing progress,
+  // so any changes saved by admin are immediately visible on login.
+  show("page-loading");
+  await initCloudSync();
+  hide("page-loading");
+
+  if (isAdmin) {
+    // Show admin candidate picker on progress page
+    const picker = document.getElementById("progress-candidate-select");
+    picker.innerHTML = "";
+    CANDIDATES.forEach(c => {
+      const opt = document.createElement("option");
+      opt.value = c.name; opt.textContent = c.name;
+      if (c.name === viewingCandidate) opt.selected = true;
+      picker.appendChild(opt);
+    });
+    document.getElementById("admin-candidate-picker").style.display = "block";
+    document.getElementById("btn-update-status").style.display   = "block";
+    document.getElementById("btn-update-status-2").style.display = "block";
+    document.getElementById("btn-pay-summary").style.display     = "block";
+    document.getElementById("btn-dashboard").style.display       = "block";
+    document.getElementById("footer-note").textContent = "Admin mode — you can view & update all candidates.";
+
+    // Populate admin panel candidate dropdown too
+    const adminSel = document.getElementById("admin-candidate-select");
+    adminSel.innerHTML = '<option value="">-- Select a candidate --</option>';
+    CANDIDATES.forEach(c => {
+      const opt = document.createElement("option");
+      opt.value = c.name; opt.textContent = c.name;
+      adminSel.appendChild(opt);
+    });
+  } else {
+    document.getElementById("admin-candidate-picker").style.display = "none";
+    document.getElementById("btn-update-status").style.display   = "none";
+    document.getElementById("btn-update-status-2").style.display = "none";
+    document.getElementById("btn-pay-summary").style.display     = "none";
+    document.getElementById("btn-dashboard").style.display       = "none";
+    document.getElementById("footer-note").textContent = "Tap a stage name to expand its sub-stages.";
+  }
+
+  showProgress();
+}
+
+function onProgressCandidateChange() {
+  viewingCandidate = document.getElementById("progress-candidate-select").value;
+  showProgress();
+}
+
+// ─────────────────────────────────────────────────────────
+//  PROGRESS VIEW
+// ─────────────────────────────────────────────────────────
+function showProgress() {
+  const name = viewingCandidate;
+  if (!name) return;
+  const statuses = getStatusForCandidate(name);
+
+  document.getElementById("candidate-avatar").textContent = name.charAt(0).toUpperCase();
+  document.getElementById("candidate-name-display").textContent = name + (isAdmin ? " 🔧" : "");
+
+  let done = 0, prog = 0, pending = 0;
+  STAGES.forEach(s => {
+    const st = statuses[s.name].status;
+    if (st === "completed") done++;
+    else if (st === "inprogress") prog++;
+    else pending++;
+  });
+  const total = STAGES.length;
+  document.getElementById("sum-total").textContent = total;
+  document.getElementById("sum-done").textContent  = done;
+  document.getElementById("sum-prog").textContent  = prog;
+  document.getElementById("sum-pend").textContent  = pending;
+  const pct = Math.round((done / total) * 100);
+  document.getElementById("pct-label").textContent   = pct + "%";
+  document.getElementById("overall-bar").style.width = pct + "%";
+  document.getElementById("candidate-status-summary").textContent =
+    done === total ? "All stages complete! 🎉" : done + "/" + total + " stages completed";
+
+  // Motivational message
+  updateMotivMessage(name, pct, total - done);
+
+  const track = document.getElementById("progress-track");
+  track.innerHTML = "";
+  [...STAGES].reverse().forEach((stage, revIdx) => {
+    const stepNum = STAGES.length - revIdx;
+    const sn = stage.name, sd = statuses[sn], st = sd.status, dt = sd.date;
+    const hasSubs = stage.substages && stage.substages.length > 0;
+    const slug = slugify(sn);
+    const dtHtml = dt ? `<div class="stage-date-label">📅 ${dateVerb(st)}: <span>${fmtDate(dt)}</span></div>` : "";
+    let subPanelHtml = "";
+    if (hasSubs) {
+      const subItems = stage.substages.map(subObj => {
+        const subName = typeof subObj === "string" ? subObj : subObj.name;
+        const subD = (sd.substages && sd.substages[subName]) || { status: "notstarted", date: "" };
+        const subDtHtml = subD.date ? `<div class="substage-date-label">📅 ${dateVerb(subD.status)}: <span>${fmtDate(subD.date)}</span></div>` : "";
+        // Render sub-substages if present
+        let ssHtml = "";
+        if (typeof subObj === "object" && subObj.subsubstages) {
+          const ssSlug = slug + "--ss--" + slugify(subName);
+          const ssItems = subObj.subsubstages.map(ssub => {
+            const ssD = (subD.subsubstages && subD.subsubstages[ssub]) || { status: "notstarted", date: "" };
+            const ssDtHtml = ssD.date ? `<div class="substage-date-label" style="padding-left:4px;">📅 ${dateVerb(ssD.status)}: <span>${fmtDate(ssD.date)}</span></div>` : "";
+            return `<div class="substage-item" style="padding-left:8px;">
+              <div class="substage-dot ${dotClass(ssD.status)}" style="width:10px;height:10px;margin-top:4px;flex-shrink:0;"></div>
+              <div class="substage-info">
+                <div class="substage-name" style="font-size:12px;color:#6b7280;">↳ ${ssub}</div>
+                <span class="substage-badge ${badgeClass(ssD.status)}" style="font-size:10px;">${STATUS_LABELS[ssD.status]}</span>
+                ${ssDtHtml}
+              </div>
+            </div>`;
+          }).join("");
+          const ssSlugId = "ss-panel--" + slug + "--" + slugify(subName);
+          ssHtml = `<div style="margin-top:4px;">
+            <span class="substage-chip" onclick="toggleSSPanel('${ssSlugId}', this)">▶ Steps</span>
+            <div class="substage-panel" id="${ssSlugId}" style="margin-top:6px;margin-left:4px;background:#eef4ff;border-left-color:#bdd1f8;">${ssItems}</div>
+          </div>`;
+        }
+        return `<div class="substage-item">
+          <div class="substage-dot ${dotClass(subD.status)}"></div>
+          <div class="substage-info">
+            <div class="substage-name">${subName}</div>
+            <span class="substage-badge ${badgeClass(subD.status)}">${STATUS_LABELS[subD.status]}</span>
+            ${subDtHtml}
+            ${ssHtml}
+          </div>
+        </div>`;
+      }).join("");
+      subPanelHtml = `<div class="substage-panel" id="subpanel-${slug}">${subItems}</div>`;
+    }
+    const headerClass = "stage-header-row" + (hasSubs ? " clickable" : "");
+    const arrowHtml   = hasSubs ? `<span class="expand-arrow" id="arrow-${slug}">▶</span>` : "";
+    const chipHtml    = hasSubs ? `<span class="substage-chip" onclick="toggleSubs('${slug}')">📋 ${stage.substages.length} sub-stages</span>` : "";
+    const item = document.createElement("div");
+    item.className = "stage-item";
+    item.innerHTML = `
+      <div class="stage-number">${stepNum}</div>
+      <div class="stage-dot ${dotClass(st)}"></div>
+      <div class="stage-info">
+        <div class="${headerClass}" ${hasSubs ? `onclick="toggleSubs('${slug}')"` : ""}>
+          <span class="stage-name">${sn}</span>${arrowHtml}
+        </div>
+        <div><span class="stage-badge ${badgeClass(st)}">${STATUS_LABELS[st]}</span>${chipHtml}</div>
+        ${dtHtml}${subPanelHtml}
+      </div>`;
+    track.appendChild(item);
+  });
+
+
+  // ── Payment entries (view) ──────────────────────────────
+  const existingPaySection = document.getElementById("payment-view-section");
+  if (existingPaySection) existingPaySection.remove();
+  const pays = getPayments(name);
+  const payDiv = document.createElement("div");
+  payDiv.id = "payment-view-section";
+  payDiv.className = "payment-section";
+  payDiv.innerHTML = `<div class="payment-section-title">💳 Payment Details</div>` +
+    PAYMENT_ENTRIES.map(e => {
+      const p = pays[e.id];
+      const parts = [
+        `<span class="payment-badge ${payBadgeClass(p.status)}">${PAYMENT_STATUSES[p.status]}</span>`,
+        p.amount ? `<span class="payment-inline-detail">💵 ${p.amount}</span>` : "",
+        p.bank ? `<span class="payment-inline-detail">🏦 ${p.bank}</span>` : "",
+        p.date ? `<span class="payment-inline-detail">📅 ${fmtDate(p.date)}</span>` : "",
+      ].filter(Boolean).join("");
+      return `<div class="payment-item-compact">
+        <span class="payment-item-label">💰 ${e.label}</span>
+        <div class="payment-inline-row">${parts}</div>
+      </div>`;
+    }).join("");
+  track.parentNode.insertBefore(payDiv, track.nextSibling);
+  show("progress-page");
+  hide("page-login");
+  hide("admin-panel");
+  refreshLastUpdatedDisplay(name);
+  // Candidate: fire if admin unlocked a milestone for them since their last view
+  if (!isAdmin) {
+    setTimeout(() => checkCandidatePendingMilestones(name), 600);
+    checkAndShowWelcomeMilestone(name);
+  }
+  window.scrollTo(0, 0);
+}
+
+function toggleSubs(slug) {
+  const panel = document.getElementById("subpanel-" + slug);
+  const arrow = document.getElementById("arrow-" + slug);
+  if (!panel) return;
+  const open = panel.classList.toggle("open");
+  if (arrow) arrow.classList.toggle("open", open);
+}
+
+function toggleSSPanel(id, chip) {
+  const panel = document.getElementById(id);
+  if (!panel) return;
+  panel.classList.toggle("open");
+  chip.textContent = panel.classList.contains("open") ? "▼ Steps" : "▶ Steps";
+}
+
+// function shareToWhatsApp() {
+//   gtag('event', 'Tracker_ShareWhatsAppGroupLink', { type: 'individual_query' });
+//   const boldSentence = "Hey... Join in this WhatsApp group if you are interested in Australia AHPRA registration without any exam";
+//   const existingText = "I already joined. Many nurses are there. We can ask any doubts. Its useful. https://chat.whatsapp.com/DgauJpD3jcU2sL3WPKB1YJ %0A%0A" + "Share to your friends (2017 or later passout) too if they are interested";
+//   const fullText = boldSentence + "%0A%0A" + existingText;
+//   window.open("https://wa.me/?text=" + fullText, "_blank");
+// }
+
+function ShareWhatsAppGroupLink() {
+  gtag('event', 'Tracker_ShareWhatsAppGroupLink', { type: 'individual_query' });
+  const boldSentence = "Hey... Join in this WhatsApp group if you are interested in Australia AHPRA registration without any exam";
+  const existingText = "I already joined. Many nurses are there. We can ask any doubts. Its useful. https://chat.whatsapp.com/DgauJpD3jcU2sL3WPKB1YJ %0A%0A" + "Share to your friends (2017 or later passout) too if they are interested";
+  const fullText = boldSentence + "%0A%0A" + existingText;
+  window.open("https://wa.me/?text=" + fullText, "_blank");
+}
+
+function ReferShaji() {
+  gtag('event', 'Tracker_ReferShajiButtonClick', { type: 'individual_query' });
+  const boldSentence = "Hey... I am doing my Australia AHPRA registration with the support of Shaji Sebastian. Let me know if you are interested.";
+  const existingText = "or you can contact him directly. His WhatsApp number is +61 467 971 690";
+  const fullText = boldSentence + "%0A%0A" + existingText;
+  window.open("https://wa.me/?text=" + fullText, "_blank");
+}
+
+function goBack() {
+  // Logout: clear session and go back to login
+  isAdmin = false; currentUser = null; viewingCandidate = null;
+  hide("progress-page"); hide("admin-panel");
+  show("page-login");
+  document.getElementById("login-code").focus();
+  window.scrollTo(0, 0);
+}
+
+// ─────────────────────────────────────────────────────────
+//  ADMIN PANEL
+// ─────────────────────────────────────────────────────────
+function showAdmin() {
+  if (!isAdmin) return;
+  // Pre-select the candidate currently being viewed
+  const sel = document.getElementById("admin-candidate-select");
+  if (viewingCandidate) sel.value = viewingCandidate;
+  hide("progress-page");
+  show("admin-panel");
+  loadAdminStages();
+  window.scrollTo(0, 0);
+}
+
+function loadAdminStages() {
+  const candidateName = document.getElementById("admin-candidate-select").value;
+  const container = document.getElementById("admin-stages");
+  container.innerHTML = "";
+  if (!candidateName) return;
+  const statuses = getStatusForCandidate(candidateName);
+  STAGES.forEach(stage => {
+    const sn = stage.name, sd = statuses[sn], st = sd.status, dt = sd.date;
+    const slug = slugify(sn), hasSubs = stage.substages && stage.substages.length > 0;
+    let html = `<div class="stage-row-main">
+      <div class="stage-label">${sn}</div>
+      <div class="stage-controls">
+        <select class="stage-select status-${st}" id="sel-${slug}" onchange="updateSelectStyle(this)">
+          <option value="notstarted" ${st==="notstarted"?"selected":""}>Not Started</option>
+          <option value="inprogress" ${st==="inprogress"?"selected":""}>In Progress</option>
+          <option value="completed"  ${st==="completed"?"selected":""}>Completed</option>
+        </select>
+        <input type="date" class="stage-date-input" id="date-${slug}" value="${dt}" title="Date" />
+      </div>
+    </div>`;
+    if (hasSubs) {
+      const subRows = stage.substages.map(subObj => {
+        const subName = typeof subObj === "string" ? subObj : subObj.name;
+        const subSlug = slug + "--" + slugify(subName);
+        const subD = (sd.substages && sd.substages[subName]) || { status: "notstarted", date: "" };
+        let ssBlock = "";
+        if (typeof subObj === "object" && subObj.subsubstages) {
+          const ssRows = subObj.subsubstages.map(ssub => {
+            const ssSlug = subSlug + "--ss--" + slugify(ssub);
+            const ssD = (subD.subsubstages && subD.subsubstages[ssub]) || { status: "notstarted", date: "" };
+            return `<div class="sub-stage-row" style="padding-left:8px;">
+              <div class="sub-stage-label" style="font-size:12px;color:#6b7280;">↳ ${ssub}</div>
+              <div class="stage-controls">
+                <select class="stage-select status-${ssD.status}" id="sel-${ssSlug}" onchange="updateSelectStyle(this)">
+                  <option value="notstarted" ${ssD.status==="notstarted"?"selected":""}>Not Started</option>
+                  <option value="inprogress" ${ssD.status==="inprogress"?"selected":""}>In Progress</option>
+                  <option value="completed"  ${ssD.status==="completed"?"selected":""}>Completed</option>
+                </select>
+                <input type="date" class="stage-date-input" id="date-${ssSlug}" value="${ssD.date}" title="Sub-sub-stage date" />
+              </div>
+            </div>`;
+          }).join("");
+          ssBlock = `<div class="sub-stage-block" style="margin-left:20px;border-left-color:#bdd1f8;background:#eef4ff;">${ssRows}</div>`;
+        }
+        return `<div class="sub-stage-row">
+          <div class="sub-stage-label">${subName}</div>
+          <div class="stage-controls">
+            <select class="stage-select status-${subD.status}" id="sel-${subSlug}" onchange="updateSelectStyle(this)">
+              <option value="notstarted" ${subD.status==="notstarted"?"selected":""}>Not Started</option>
+              <option value="inprogress" ${subD.status==="inprogress"?"selected":""}>In Progress</option>
+              <option value="completed"  ${subD.status==="completed"?"selected":""}>Completed</option>
+            </select>
+            <input type="date" class="stage-date-input" id="date-${subSlug}" value="${subD.date}" title="Sub-stage date" />
+          </div>
+        </div>${ssBlock}`;
+      }).join("");
+      html += `<div class="sub-stage-block">${subRows}</div>`;
+    }
+    const wrapper = document.createElement("div");
+    wrapper.className = "stage-row";
+    wrapper.innerHTML = html;
+    container.appendChild(wrapper);
+  });
+
+  // ── Payment entries (admin editable) ───────────────────
+  const adminPays = getPayments(candidateName);
+  PAYMENT_ENTRIES.forEach(e => {
+    const p = adminPays[e.id];
+    const bankOpts = PAYMENT_BANKS.map(b => `<option value="${b}" ${p.bank===b?"selected":""}>${b}</option>`).join("");
+    const pw = document.createElement("div");
+    pw.className = "stage-row";
+    pw.innerHTML = `<div class="stage-row-main">
+      <div class="stage-label">💰 ${e.label}</div>
+    </div>
+    <div class="sub-stage-block" style="margin-bottom:10px;">
+      <div class="payment-fields" style="padding:8px 0;">
+        <div class="payment-field-row">
+          <div class="payment-field-label">Status</div>
+          <select class="stage-select payment-select editable ${payStatusClass(p.status)}" id="paysel-${e.id}" onchange="updatePaySelectStyle(this)">
+            <option value="notstarted" ${p.status==="notstarted"?"selected":""}>Not Started</option>
+            <option value="pending"    ${p.status==="pending"?"selected":""}>Pending Payment</option>
+            <option value="paid"       ${p.status==="paid"?"selected":""}>Paid</option>
+          </select>
+        </div>
+        <div class="payment-field-row">
+          <div class="payment-field-label">Amount</div>
+          <input type="text" class="stage-date-input" id="payamount-${e.id}" value="${p.amount||''}" maxlength="10" placeholder="e.g. 500 AUD" style="width:100%;" />
+        </div>
+        <div class="payment-field-row">
+          <div class="payment-field-label">Bank Account</div>
+          <select class="stage-select payment-select editable" id="paybank-${e.id}">
+            <option value="">-- Select bank --</option>
+            ${bankOpts}
+          </select>
+        </div>
+        <div class="payment-field-row">
+          <div class="payment-field-label">Date</div>
+          <input type="date" class="stage-date-input" id="paydate-${e.id}" value="${p.date}" />
+        </div>
+      </div>
+    </div>`;
+    container.appendChild(pw);
+  });
+}
+
+function updateSelectStyle(sel) { sel.className = "stage-select status-" + sel.value; }
+function updatePaySelectStyle(sel) { sel.className = "stage-select payment-select editable " + payStatusClass(sel.value); }
+
+function saveStatus() {
+  const candidateName = document.getElementById("admin-candidate-select").value;
+  if (!candidateName) { alert("Please select a candidate first."); return; }
+  const obj = {};
+  STAGES.forEach(stage => {
+    const sn = stage.name, slug = slugify(sn);
+    const sel = document.getElementById("sel-" + slug);
+    const dtFl = document.getElementById("date-" + slug);
+    obj[sn] = { status: sel ? sel.value : "notstarted", date: dtFl ? dtFl.value : "" };
+    if (stage.substages && stage.substages.length) {
+      obj[sn].substages = {};
+      stage.substages.forEach(subObj => {
+        const subName = typeof subObj === "string" ? subObj : subObj.name;
+        const subSlug = slug + "--" + slugify(subName);
+        const subEntry = {
+          status: (document.getElementById("sel-"  + subSlug) || {}).value || "notstarted",
+          date:   (document.getElementById("date-" + subSlug) || {}).value || "",
+        };
+        if (typeof subObj === "object" && subObj.subsubstages) {
+          subEntry.subsubstages = {};
+          subObj.subsubstages.forEach(ssub => {
+            const ssSlug = subSlug + "--ss--" + slugify(ssub);
+            subEntry.subsubstages[ssub] = {
+              status: (document.getElementById("sel-"  + ssSlug) || {}).value || "notstarted",
+              date:   (document.getElementById("date-" + ssSlug) || {}).value || "",
+            };
+          });
+        }
+        obj[sn].substages[subName] = subEntry;
+      });
+    }
+  });
+  // Check for newly-completed milestones BEFORE writing to storage
+  checkAndQueueMilestone(candidateName, obj);
+
+  setStatusForCandidate(candidateName, obj);
+
+  // Save payment entries
+  const pays = {};
+  PAYMENT_ENTRIES.forEach(e => {
+    pays[e.id] = {
+      status: (document.getElementById("paysel-"    + e.id) || {}).value || "notstarted",
+      amount: (document.getElementById("payamount-" + e.id) || {}).value || "",
+      bank:   (document.getElementById("paybank-"   + e.id) || {}).value || "",
+      date:   (document.getElementById("paydate-"   + e.id) || {}).value || "",
+    };
+  });
+  savePayments(candidateName, pays);
+
+  // Auto-record last updated timestamp
+  setLastUpdated(candidateName, new Date().toISOString());
+
+  const btn = event.target, orig = btn.textContent;
+  btn.textContent = "✅ Saved!"; btn.disabled = true;
+  setTimeout(() => {
+    btn.textContent = orig; btn.disabled = false;
+    triggerMilestoneIfPending();
+  }, 1500);
+}
+
+function closeAdmin() {
+  hide("admin-panel");
+  // Go back to progress view showing the candidate that was selected in admin
+  const adminSel = document.getElementById("admin-candidate-select").value;
+  if (adminSel) {
+    viewingCandidate = adminSel;
+    // Keep picker in sync
+    document.getElementById("progress-candidate-select").value = adminSel;
+  }
+  showProgress();
+}
+
+// ─────────────────────────────────────────────────────────
+//  PAYMENT SUMMARY (admin only)
+// ─────────────────────────────────────────────────────────
+function showPaySummary() {
+  if (!isAdmin) return;
+
+  const tbody = document.getElementById("pay-summary-tbody");
+  const totalsStrip = document.getElementById("pay-totals-strip");
+  tbody.innerHTML = "";
+  totalsStrip.innerHTML = "";
+
+  let totalPaid = 0, totalPending = 0, totalNone = 0;
+  // Track sums per currency unit (e.g. "Pounds", "AUD", etc.)
+  const currencySums = {};   // { "Pounds": 350, "AUD": 200, ... }
+
+  // Helper: parse an amount string like "175 Pounds" → { num: 175, unit: "Pounds" }
+  function parseAmount(raw) {
+    if (!raw) return null;
+    const m = raw.trim().match(/^([£$€]?\s*)([\d,]+(?:\.\d+)?)\s*(.*)$|^([\d,]+(?:\.\d+)?)\s*(.+)$/i);
+    if (!m) return null;
+    // Two possible match groups depending on whether symbol is prefix or suffix
+    let num, unit;
+    if (m[2]) {
+      num  = parseFloat(m[2].replace(/,/g, ""));
+      unit = (m[1].trim() + " " + m[3].trim()).trim() || "?";
+    } else {
+      num  = parseFloat(m[4].replace(/,/g, ""));
+      unit = m[5].trim() || "?";
+    }
+    if (isNaN(num)) return null;
+    return { num, unit };
+  }
+
+  const statusLabel = { notstarted: "Not Started", pending: "Pending Payment", paid: "Paid" };
+  const badgeClass  = { notstarted: "tbl-badge-notstarted", pending: "tbl-badge-pending", paid: "tbl-badge-paid" };
+
+  CANDIDATES.forEach((cand, ci) => {
+    const pays = getPayments(cand.name);
+
+    PAYMENT_ENTRIES.forEach((entry, ei) => {
+      const p = pays[entry.id];
+      const isFirstRow = (ei === 0);
+
+      // Count status totals
+      if (p.status === "paid")         totalPaid++;
+      else if (p.status === "pending") totalPending++;
+      else                             totalNone++;
+
+      // Accumulate amount sums
+      const parsed = parseAmount(p.amount);
+      if (parsed) {
+        currencySums[parsed.unit] = (currencySums[parsed.unit] || 0) + parsed.num;
+      }
+
+      const nameCell = isFirstRow
+        ? `<td class="col-name" rowspan="${PAYMENT_ENTRIES.length}" style="border-right:1px solid #eef2fb;">${cand.name}</td>`
+        : "";
+
+      const amountHtml = p.amount
+        ? `<strong>${p.amount}</strong>`
+        : `<span class="col-empty">—</span>`;
+
+      const bankHtml = p.bank || `<span class="col-empty">—</span>`;
+      const dateHtml = p.date ? fmtDate(p.date) : `<span class="col-empty">—</span>`;
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        ${nameCell}
+        <td class="col-gift">${entry.label}</td>
+        <td><span class="tbl-badge ${badgeClass[p.status] || 'tbl-badge-notstarted'}">${statusLabel[p.status] || "Not Started"}</span></td>
+        <td class="col-amount">${amountHtml}</td>
+        <td class="col-bank">${bankHtml}</td>
+        <td class="col-date">${dateHtml}</td>`;
+      if (isFirstRow && ci > 0) tr.style.borderTop = "2px solid #d0d9f0";
+      tbody.appendChild(tr);
+    });
+  });
+
+  // Build total-amount display string (handles multiple currencies gracefully)
+  const sumParts = Object.entries(currencySums).map(([unit, total]) => {
+    // Format: remove trailing .0 if whole number
+    const formatted = Number.isInteger(total) ? total : total.toFixed(2);
+    return `${formatted} ${unit}`;
+  });
+  const sumDisplay = sumParts.length ? sumParts.join(" + ") : "—";
+
+  // Totals strip
+  const totalEntries = CANDIDATES.length * PAYMENT_ENTRIES.length;
+  totalsStrip.innerHTML = `
+    <div class="pay-totals-pill ptpill-paid">
+      <span>${totalPaid}</span>Paid
+    </div>
+    <div class="pay-totals-pill ptpill-pending">
+      <span>${totalPending}</span>Pending
+    </div>
+    <div class="pay-totals-pill ptpill-none">
+      <span>${totalNone}</span>Not Started
+    </div>
+    <div class="pay-totals-pill" style="background:#e0ebff;color:#1a3a6b;flex:2;min-width:180px;">
+      <span style="font-size:16px;">${sumDisplay}</span>Total Amount (All Gifts)
+    </div>`;
+
+  document.getElementById("pay-summary-overlay").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function closePaySummary() {
+  document.getElementById("pay-summary-overlay").classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+// ─────────────────────────────────────────────────────────
+//  ADMIN DASHBOARD
+// ─────────────────────────────────────────────────────────
+function showDashboard() {
+  if (!isAdmin) return;
+
+  const grid       = document.getElementById("dash-grid");
+  grid.innerHTML   = "";
+  dashSortDir      = null;
+  dashActiveFilter = "all";
+  const arrowEl    = document.getElementById("sort-arrow");
+  if (arrowEl) arrowEl.textContent = "⇅";
+
+  let totalDone = 0, totalProg = 0, totalNotStarted = 0;
+
+  // Colour pool for avatars
+  const avColors = [
+    "av-progress","av-done","av-progress","av-notstarted",
+    "av-done","av-progress","av-notstarted","av-done"
+  ];
+
+  CANDIDATES.forEach((cand, ci) => {
+    const statuses = getStatusForCandidate(cand.name);
+    const pays     = getPayments(cand.name);
+
+    // ── Completion stats ───────────────────────────────
+    let done = 0, prog = 0;
+    STAGES.forEach(s => {
+      const st = statuses[s.name].status;
+      if      (st === "completed")  done++;
+      else if (st === "inprogress") prog++;
+    });
+    const total  = STAGES.length;
+    const pct    = Math.round((done / total) * 100);
+    const allDone = done === total;
+    const hasActivity = done > 0 || prog > 0;
+    if (allDone)             totalDone++;
+    else if (hasActivity)    totalProg++;
+    else                   totalNotStarted++;
+
+    // ── Current active stage ───────────────────────────
+    // If no activity at all → "Not Started"; else first in-progress stage,
+    // else first not-started stage, else "All Complete"
+    let currentStage = "All stages complete ✅";
+    let stageNum = STAGES.length + 1; // sort completed candidates last
+    if (!hasActivity) {
+      currentStage = "Not Started";
+      stageNum = 0;
+    } else {
+      for (let si = 0; si < STAGES.length; si++) {
+        if (statuses[STAGES[si].name].status === "inprogress") {
+          currentStage = STAGES[si].name;
+          stageNum = si + 1;
+          break;
+        }
+      }
+      if (currentStage === "All stages complete ✅") {
+        for (let si = 0; si < STAGES.length; si++) {
+          if (statuses[STAGES[si].name].status === "notstarted") {
+            currentStage = STAGES[si].name;
+            stageNum = si + 1;
+            break;
+          }
+        }
+      }
+    }
+
+    // ── Payment chips ──────────────────────────────────
+    const payChipsHtml = PAYMENT_ENTRIES.map(e => {
+      const p = pays[e.id];
+      const chipClass = p.status === "paid" ? "dpc-paid" : p.status === "pending" ? "dpc-pending" : "dpc-notstarted";
+      const icon = p.status === "paid" ? "✅" : p.status === "pending" ? "⏳" : "○";
+      if (p.status === "paid") { /* paid */ }
+      return `<span class="dash-pay-chip ${chipClass}">${icon} ${e.label.replace("Gift to Shaji – ", "Gift ")}</span>`;
+    }).join("");
+
+    // ── Milestone badge ────────────────────────────────
+    let milestoneBadge = "";
+    if (statuses["Got AHPRA Registration"]?.status === "completed") milestoneBadge = "🏆";
+    else if (statuses["OSCE"]?.status === "completed")              milestoneBadge = "🥳";
+    else if (statuses["Self-Check"]?.status === "completed" || statuses["Self-Check"]?.status === "inprogress") milestoneBadge = "🌱";
+
+    // ── Last updated ───────────────────────────────────
+    const lastUpd = getLastUpdated(cand.name);
+    const updHtml = lastUpd
+      ? `<div class="dash-updated">🕐 Updated: ${fmtLastUpdated(lastUpd)}</div>`
+      : `<div class="dash-updated">🕐 Not yet updated</div>`;
+
+    // ── Card colour class ──────────────────────────────
+    const dcClass = allDone ? "dc-done" : prog > 0 ? "dc-progress" : "dc-notstarted";
+    const avClass = allDone ? "av-done" : prog > 0 ? "av-progress" : "av-notstarted";
+    const bfClass = allDone ? "bf-done" : prog > 0 ? "bf-progress" : "bf-notstarted";
+
+    // ── Build table row ────────────────────────────────
+    const dotCls = allDone ? "dot-done" : hasActivity ? "dot-progress" : "dot-pending";
+    const rowFilter = allDone ? "done" : hasActivity ? "progress" : "notstarted";
+    const row = document.createElement("tr");
+    row.dataset.stageNum = stageNum;
+    row.dataset.filter   = rowFilter;
+    row.innerHTML = `
+      <td>
+        <div class="dash-td-name">
+          <span class="dash-row-dot ${dotCls}"></span>
+          ${cand.name}
+          ${milestoneBadge ? `<span style="font-size:15px;">${milestoneBadge}</span>` : ""}
+        </div>
+      </td>
+      <td class="dash-td-stage">${currentStage}</td>
+      <td class="dash-td-view"><a href="#" onclick="dashViewCandidate('${cand.name}',event);return false;">View →</a></td>`;
+    grid.appendChild(row);
+  });
+
+  // ── Summary stats ──────────────────────────────────────
+  document.getElementById("ds-total").textContent      = CANDIDATES.length;
+  document.getElementById("ds-done").textContent       = totalDone;
+  document.getElementById("ds-prog").textContent       = totalProg;
+  document.getElementById("ds-notstarted").textContent = totalNotStarted;
+
+  hide("progress-page");
+  hide("admin-panel");
+  show("dashboard-page");
+  filterDashboard("all");
+  window.scrollTo(0, 0);
+}
+
+function dashViewCandidate(name, e) {
+  e.stopPropagation();
+  viewingCandidate = name;
+  // Sync pickers
+  document.getElementById("progress-candidate-select").value = name;
+  document.getElementById("admin-candidate-select").value    = name;
+  closeDashboard();
+}
+
+function closeDashboard() {
+  hide("dashboard-page");
+  show("progress-page");
+  showProgress();
+  window.scrollTo(0, 0);
+}
+
+// ─────────────────────────────────────────────────────────
+//  DASHBOARD SORT
+// ─────────────────────────────────────────────────────────
+let dashSortDir = null; // null | 'asc' | 'desc'
+let dashActiveFilter = "all"; // 'all' | 'done' | 'progress' | 'notstarted'
+
+function filterDashboard(filter) {
+  dashActiveFilter = filter;
+  const rows    = document.querySelectorAll("#dash-grid tr");
+  const bar     = document.getElementById("dash-filter-bar");
+  const label   = document.getElementById("dash-filter-label");
+  const pills   = {
+    all:        document.getElementById("pill-all"),
+    done:       document.getElementById("pill-done"),
+    progress:   document.getElementById("pill-progress"),
+    notstarted: document.getElementById("pill-notstarted")
+  };
+
+  // Show/hide rows
+  rows.forEach(row => {
+    if (filter === "all" || row.dataset.filter === filter) {
+      row.style.display = "";
+    } else {
+      row.style.display = "none";
+    }
+  });
+
+  // Update pill highlight styles
+  Object.keys(pills).forEach(key => {
+    if (!pills[key]) return;
+    if (filter === "all") {
+      pills[key].classList.remove("filter-active", "filter-inactive");
+    } else if (key === filter) {
+      pills[key].classList.add("filter-active");
+      pills[key].classList.remove("filter-inactive");
+    } else {
+      pills[key].classList.add("filter-inactive");
+      pills[key].classList.remove("filter-active");
+    }
+  });
+
+  // Update filter bar
+  const labels = { all: "All Candidates", done: "Fully Done", progress: "In Progress", notstarted: "Not Started" };
+  if (filter === "all") {
+    bar.classList.remove("visible");
+  } else {
+    bar.classList.add("visible");
+    label.textContent = "🔍 Showing: " + labels[filter];
+  }
+}
+
+function sortDashByStage() {
+  const tbody = document.getElementById("dash-grid");
+  const rows  = Array.from(tbody.querySelectorAll("tr"));
+  const arrow = document.getElementById("sort-arrow");
+
+  // Cycle: none → asc → desc → asc …
+  dashSortDir = (dashSortDir === "asc") ? "desc" : "asc";
+
+  rows.sort((a, b) => {
+    const na = parseInt(a.dataset.stageNum, 10);
+    const nb = parseInt(b.dataset.stageNum, 10);
+    return dashSortDir === "asc" ? na - nb : nb - na;
+  });
+
+  rows.forEach(r => tbody.appendChild(r));
+  arrow.textContent = dashSortDir === "asc" ? "↑" : "↓";
+}
+
+// ─────────────────────────────────────────────────────────
+//  MILESTONE CELEBRATIONS
+// ─────────────────────────────────────────────────────────
+const MILESTONES = {
+  "Self-Check": {
+    tier: 1,
+    emoji: "✅",
+    tag: "Stage 1 Complete",
+    title: "Great Start!",
+    msg: name => `Well done, <span class="milestone-name">${name}</span>! 🎊<br><br>Your eligibility is confirmed — the AHPRA journey has officially begun. Every big achievement starts with one step, and you've just taken yours!`,
+    closeBtn: "🚀 Let's keep going!"
+  },
+  "OSCE": {
+    tier: 2,
+    emoji: "🥳",
+    tag: "NCLEX and OSCE Cleared!",
+    title: "Outstanding Achievement!",
+    msg: name => `Amazing work, <span class="milestone-name">${name}</span>! 🌟<br><br>You've got exemption from NCLEX and OSCE — one of the most important achievements in the AHPRA pathway. It's party time 🥳🥳🥳`,
+    closeBtn: "💪 Almost there!"
+  },
+  "Got AHPRA Registration": {
+    tier: 3,
+    emoji: "🏆",
+    tag: "🌟 AHPRA Registered! 🌟",
+    title: "Congratulations!",
+    msg: name => `<strong style="color:#92400e;font-size:16px;">You did it, <span class="milestone-name">${name}</span>!</strong><br><br>🎆 You are now officially a <strong>Registered Nurse in Australia!</strong><br><br>One of the great achievements in your career. Welcome to Australia! 🦘🇦🇺`,
+    closeBtn: "🎉 Woohoo! I'm registered!"
+  }
+};
+
+// ── Welcome milestone (shown once on first-ever login, not tied to a stage) ──
+const WELCOME_MILESTONE = {
+  tier: 0,
+  emoji: "🌟",
+  tag: "Welcome Aboard!",
+  title: "Your Journey Begins!",
+  msg: name => `Welcome, <span class="milestone-name">${name}</span>! 🎉<br><br>
+    Congratulations on your decision to start the AHPRA registration journey with <strong>Shaji Sebastian</strong>! 🙌<br><br>
+    This will be a <strong>completely stress-free journey</strong> through <strong>8 stages</strong> and <strong>25+ sub-stages</strong>. Shaji will hold your hand and walk with you every step of the way — right until you proudly hold your <strong>AHPRA registration</strong>! 🏆<br><br>
+    You are not alone in this. Let's do this together! 💪🇦🇺`,
+  closeBtn: "🚀 Let's Begin!"
+};
+
+// pendingMilestone holds { stageName, candidateName } for the current admin session
+let pendingMilestone = null;
+
+// ── Read/write the candidate pending flag from cloud data ──────────────────
+// Stored as candidate.__milestonePending = stageName (or null) inside the cloud object.
+// Because it lives in the cloud, ANY device that loads the data will see it.
+
+function getCloudPendingMilestone(candidateName) {
+  const d = loadData();
+  return (d[candidateName] && d[candidateName].__milestonePending) || null;
+}
+
+function setCloudPendingMilestone(candidateName, stageName) {
+  const d = loadData();
+  if (!d[candidateName]) d[candidateName] = {};
+  d[candidateName].__milestonePending = stageName;
+  saveData(d);
+  syncToCloud(d);
+}
+
+function clearCloudPendingMilestone(candidateName) {
+  const d = loadData();
+  if (!d[candidateName]) return;
+  delete d[candidateName].__milestonePending;
+  saveData(d);
+  syncToCloud(d);
+}
+
+// ── Welcome popup: shown once on first-ever candidate login ───────────────
+function checkAndShowWelcomeMilestone(candidateName) {
+  const d = loadData();
+  if (d[candidateName] && d[candidateName].__welcomeShown) return; // already seen it
+  // Mark as shown in cloud so any other device won't show it again
+  if (!d[candidateName]) d[candidateName] = {};
+  d[candidateName].__welcomeShown = true;
+  saveData(d);
+  syncToCloud(d);
+  // Show after a short delay so the progress page has fully rendered
+  setTimeout(() => {
+    const m = WELCOME_MILESTONE;
+    const box = document.getElementById("milestone-box");
+    box.className = "milestone-box tier-" + m.tier;
+    document.getElementById("milestone-emoji").textContent     = m.emoji;
+    document.getElementById("milestone-tag").textContent       = m.tag;
+    document.getElementById("milestone-title").textContent     = m.title;
+    document.getElementById("milestone-msg").innerHTML         = m.msg(candidateName);
+    document.getElementById("milestone-close-btn").textContent = m.closeBtn;
+    document.getElementById("milestone-overlay").classList.add("open");
+    document.body.style.overflow = "hidden";
+    launchConfetti(m.tier);
+  }, 700);
+}
+
+// ── Detect a transition to "completed" and queue the popup ────────────────
+// Compares the new status against what is currently stored in cloud BEFORE this save.
+function checkAndQueueMilestone(candidateName, savedObj) {
+  const currentCloud = (loadData()[candidateName]) || {};
+
+  // If Self-Check is reset to "notstarted", clear the welcome flag so the
+  // welcome popup fires again on the candidate's next login.
+  const selfCheckEntry = savedObj["Self-Check"];
+  if (selfCheckEntry) {
+    const newSelfCheck  = selfCheckEntry.status;
+    const prevSelfCheck = (currentCloud["Self-Check"] && currentCloud["Self-Check"].status) || "notstarted";
+    if (newSelfCheck === "notstarted" && prevSelfCheck !== "notstarted") {
+      const d = loadData();
+      if (d[candidateName]) {
+        delete d[candidateName].__welcomeShown;
+        saveData(d);
+        syncToCloud(d);
+      }
+    }
+  }
+
+  for (const stageName of Object.keys(MILESTONES)) {
+    const entry = savedObj[stageName];
+    if (!entry) continue;
+    const newStatus  = entry.status;
+    const prevStatus = (currentCloud[stageName] && currentCloud[stageName].status) || "notstarted";
+
+    // Fire whenever the status transitions TO "completed" from anything else
+    if (newStatus === "completed" && prevStatus !== "completed") {
+      // Queue popup for admin (shown immediately after save, via triggerMilestoneIfPending)
+      pendingMilestone = { stageName, candidateName };
+      // Store the pending flag in the cloud so every other device (candidate) also sees it
+      setCloudPendingMilestone(candidateName, stageName);
+      return; // one milestone at a time
+    }
+  }
+}
+
+function triggerMilestoneIfPending() {
+  if (!pendingMilestone) return;
+  const { stageName, candidateName } = pendingMilestone;
+  pendingMilestone = null;
+  showMilestoneModal(stageName, candidateName);
+}
+
+// Called when the progress page loads for a candidate —
+// show popup if admin marked a milestone as completed (on any device).
+function checkCandidatePendingMilestones(candidateName) {
+  const stageName = getCloudPendingMilestone(candidateName);
+  if (!stageName) return;
+  // Clear the flag from cloud so it won't show again until the next transition
+  clearCloudPendingMilestone(candidateName);
+  // Show after a short delay so the progress page has fully rendered
+  setTimeout(() => showMilestoneModal(stageName, candidateName), 600);
+}
+
+function showMilestoneModal(stageName, candidateName) {
+  const m = MILESTONES[stageName];
+  if (!m) return;
+
+  const box = document.getElementById("milestone-box");
+  box.className = "milestone-box tier-" + m.tier;
+  document.getElementById("milestone-emoji").textContent      = m.emoji;
+  document.getElementById("milestone-tag").textContent        = m.tag;
+  document.getElementById("milestone-title").textContent      = m.title;
+  document.getElementById("milestone-msg").innerHTML          = m.msg(candidateName);
+  document.getElementById("milestone-close-btn").textContent  = m.closeBtn;
+
+  document.getElementById("milestone-overlay").classList.add("open");
+  document.body.style.overflow = "hidden";
+  launchConfetti(m.tier);
+}
+
+function closeMilestone() {
+  document.getElementById("milestone-overlay").classList.remove("open");
+  document.body.style.overflow = "";
+  stopConfetti();
+}
+
+// ── Confetti engine ──────────────────────────────────────
+let confettiAnimId = null;
+let confettiPieces = [];
+
+function launchConfetti(tier) {
+  const canvas = document.getElementById("confetti-canvas");
+  canvas.classList.add("active");
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const ctx = canvas.getContext("2d");
+
+  // Colour palettes per tier
+  const palettes = {
+    1: ["#10b981","#34d399","#6ee7b7","#fff","#2563eb","#60a5fa"],
+    2: ["#f59e0b","#fbbf24","#fde68a","#fff","#f97316","#fb923c"],
+    3: ["#f59e0b","#fbbf24","#ef4444","#fff","#2563eb","#a855f7","#10b981","#ec4899"]
+  };
+  const colors = palettes[tier] || palettes[1];
+  const count  = tier === 3 ? 180 : tier === 2 ? 120 : 80;
+
+  confettiPieces = Array.from({ length: count }, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height - canvas.height,
+    w: Math.random() * 10 + 6,
+    h: Math.random() * 6 + 4,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    rotation: Math.random() * Math.PI * 2,
+    rotSpeed: (Math.random() - 0.5) * 0.15,
+    vx: (Math.random() - 0.5) * 3,
+    vy: Math.random() * 3 + 2,
+    opacity: 1,
+  }));
+
+  cancelAnimationFrame(confettiAnimId);
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let alive = false;
+    confettiPieces.forEach(p => {
+      p.x += p.vx; p.y += p.vy; p.rotation += p.rotSpeed;
+      if (p.y > canvas.height * 0.7) p.opacity -= 0.012;
+      if (p.opacity > 0) { alive = true; }
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, p.opacity);
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rotation);
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      // alternate shapes: rect or circle
+      if (Math.abs(p.w - p.h) < 2) {
+        ctx.arc(0, 0, p.w / 2, 0, Math.PI * 2);
+      } else {
+        ctx.rect(-p.w / 2, -p.h / 2, p.w, p.h);
+      }
+      ctx.fill();
+      ctx.restore();
+    });
+    if (alive) confettiAnimId = requestAnimationFrame(draw);
+    else stopConfetti();
+  }
+  draw();
+}
+
+function stopConfetti() {
+  cancelAnimationFrame(confettiAnimId);
+  confettiAnimId = null;
+  confettiPieces = [];
+  const canvas = document.getElementById("confetti-canvas");
+  canvas.classList.remove("active");
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+// ─────────────────────────────────────────────────────────
+//  LAST UPDATED — per candidate
+// ─────────────────────────────────────────────────────────
+function lastUpdKey(name) { return "lastUpdated_" + name; }
+
+function getLastUpdated(name) {
+  // Primary source: cloud-synced data object
+  try {
+    const d = loadData();
+    if (d[name] && d[name].__lastUpdated) return d[name].__lastUpdated;
+  } catch(e) {}
+  // Fallback: legacy localStorage value
+  try { return localStorage.getItem(lastUpdKey(name)) || null; } catch(e) { return null; }
+}
+
+function setLastUpdated(name, isoStr) {
+  // Store inside the main cloud data object so it syncs to all devices
+  const d = loadData();
+  if (!d[name]) d[name] = {};
+  d[name].__lastUpdated = isoStr;
+  saveData(d);
+  syncToCloud(d);
+  // Also keep localStorage in sync for legacy fallback
+  try { localStorage.setItem(lastUpdKey(name), isoStr); } catch(e) {}
+}
+
+function fmtLastUpdated(isoStr) {
+  if (!isoStr) return "—";
+  const d = new Date(isoStr);
+  if (isNaN(d)) return isoStr;
+  const datePart = d.toLocaleDateString("en-AU", { day: "2-digit", month: "short", year: "numeric" });
+  const timePart = d.toLocaleTimeString("en-AU", { hour: "2-digit", minute: "2-digit", hour12: true });
+  const tzAbbr   = d.toLocaleTimeString("en-AU", { timeZoneName: "short" }).split(" ").pop();
+  return `${datePart} at ${timePart} (${tzAbbr})`;
+}
+
+function refreshLastUpdatedDisplay(name) {
+  const val = getLastUpdated(name);
+  document.getElementById("last-updated-display").textContent = fmtLastUpdated(val);
+  // Show edit button only to admin
+  document.getElementById("btn-edit-lastupd").style.display = isAdmin ? "block" : "none";
+}
+
+function openEditLastUpdated() {
+  if (!isAdmin) return;
+  const current = getLastUpdated(viewingCandidate);
+  // Pre-fill with current value or now
+  const dt = current ? new Date(current) : new Date();
+  // datetime-local needs "YYYY-MM-DDTHH:MM"
+  const pad = n => String(n).padStart(2, "0");
+  const localStr = `${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}T${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
+  document.getElementById("edit-lastupd-input").value = localStr;
+  document.getElementById("edit-lastupd-overlay").classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+function closeEditLastUpdated() {
+  document.getElementById("edit-lastupd-overlay").classList.remove("open");
+  document.body.style.overflow = "";
+}
+function saveEditLastUpdated() {
+  const val = document.getElementById("edit-lastupd-input").value;
+  if (!val) { alert("Please pick a date and time."); return; }
+  const iso = new Date(val).toISOString();
+  setLastUpdated(viewingCandidate, iso);
+  refreshLastUpdatedDisplay(viewingCandidate);
+  closeEditLastUpdated();
+}
+
+// ─────────────────────────────────────────────────────────
+//  MOTIVATIONAL MESSAGES
+// ─────────────────────────────────────────────────────────
+function updateMotivMessage(name, pct, remaining) {
+  const strip = document.getElementById("motiv-strip");
+  const msgEl = document.getElementById("motiv-msg");
+  const emoji = document.getElementById("motiv-emoji");
+  const n     = `<span class="motiv-name">${name.split(" ")[0]}</span>`; // first name only
+
+  let tier, em, msg;
+
+  if (pct === 100) {
+    tier = 100;
+    em   = "🥳";
+    msg  = `Congratulations, ${n}! 🎉 Now you are an AHPRA Registered nurse!!! Welcome to Australia! 🦘🇦🇺 <br><br>Refer your friend to Shaji today itself as a token of Thanks 🙌 🤝`;
+  }
+  else if (pct >= 85) {
+    tier = 5;
+    em   = "🏁";
+    msg  = `You have almost done all stages of your AHPRA registration journey!!! It's highly appreciated ${n}!. Now let's wait for the Case manager's final decision.`;
+  } 
+     else if (pct >= 75) {
+    tier = 4;
+    em   = "🏁";
+    msg  = `Great Progress!!! You have submitted your final application to AHPRA. So close to being AHPRA registered, ${n}! Only ID Verification is remaining.`;
+  } 
+   else if (pct >= 62) {
+    tier = 3;
+    em   = "🏁";
+    msg  = `Wow!!! Congratulations for getting exemption from NCLEX and OSCE. It's party time 🥳🥳🥳. So close to being AHPRA registered, ${n}! Just <strong>${remaining} stage${remaining > 1 ? "s" : ""}</strong> remaining. 
+    <br><br>Have a friend interested in AHPRA? Want to give her the same stress-free experience? Share your happiness with her and Refer to Shaji now 🙌 🤝`;
+  } 
+  // else if (pct === 75) {
+  //   tier = 6;
+  //   em   = "🔥";
+  //   msg  = `Three quarters done, ${n}! 🔥 You've put in incredible effort to get here. One final push and you're there!`;
+  // } else if (pct >= 51) {
+  //   tier = 5;
+  //   em   = "💪";
+  //   msg  = `More than halfway done, ${n}! 💪 You're firmly in the home stretch now — keep that energy going!`;
+  // } 
+  // else if (pct === 50) {
+  //   tier = 4;
+  //   em   = "🎯";
+  //   msg  = `Halfway there, ${n}! 🎯 You've come so far already — the second half is where champions are made!`;
+  // } 
+  // else if (pct >= 26) {
+  //     else if (pct >= 42) {
+  //   tier = 3;
+  //   em   = "🚀";
+  //   msg  = `Reaching halfway, ${n}! 💫 Third stage completed — Keep going!`;
+  // } 
+  //   else if (pct >= 42) {
+  //   tier = 4;
+  //   em   = "🚀";
+  //   msg  = `Three stages completed., ${n}! 💫 You are completing the stages fast — momentum is everything, and you've got it!`;
+  // } 
+    else if (pct >= 25) {
+    tier = 2;
+    em   = "🚀";
+    msg  = `Two stages completed, ${n}! 💫 You are completing the stages fast — momentum is everything, and you've got it!`;
+  } 
+  else if (pct >= 12) {
+    tier = 1;
+    em   = "🚀";
+    msg  = `Making solid progress, ${n}! 🚀 First stage completed. Every stage you complete brings you closer to your Australian nursing career.
+    <br><br>Want a companion during the proces? Refer your friend to Shaji so that you can easily do all things together 🙌 🤝`;
+  } 
+  // else if (pct === 25) {
+  //   tier = 2;
+  //   em   = "💫";
+  //   msg  = `A quarter of the way there, ${n}! 💫 A great start — momentum is everything, and you've got it!`;
+  // } 
+  // else if (pct >= 1) {
+  //   tier = 1;
+  //   em   = "🌱";
+  //   msg  = `Great start, ${n}! 🌱 The first steps are always the hardest, and you're already moving. Keep going!`;
+  // } 
+  else {
+    tier = 0;
+    em   = "👋";
+    msg  = `Welcome, ${n}! 👋 Your AHPRA registration journey starts here. Every great achievement begins with a single step — let's go!`;
+  }
+
+  // Swap colour class
+  strip.className = `motiv-strip motiv-${tier}`;
+  emoji.textContent = em;
+  msgEl.innerHTML   = msg;
+  strip.style.display = "flex";
+
+  // Show WhatsApp invite button only on milestone tiers
+  const waBtn = document.getElementById("motiv-whatsapp-btn");
+  if (waBtn) {
+    const showBtn = (tier === 1 || tier === 3 || tier === 100);
+    waBtn.style.display = showBtn ? "flex" : "none";
+  }
+}
+
+// ─────────────────────────────────────────────────────────
+//  HELPERS
+// ─────────────────────────────────────────────────────────
+function slugify(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""); }
+function fmtDate(dateStr) { if (!dateStr) return null; return new Date(dateStr + "T00:00:00").toLocaleDateString("en-AU", { day: "2-digit", month: "short", year: "numeric" }); }
+function dateVerb(status) { return status === "completed" ? "Completed on" : status === "inprogress" ? "Started on" : "Date"; }
+function dotClass(status)   { return "dot-"   + (status || "notstarted"); }
+function badgeClass(status) { return "badge-" + (status || "notstarted"); }
+function show(id) { document.getElementById(id).style.display = "block"; }
+function hide(id) { document.getElementById(id).style.display = "none";  }
+
+// ─────────────────────────────────────────────────────────
+//  INIT
+// ─────────────────────────────────────────────────────────
+show("page-loading");
+initCloudSync().then(() => {
+  hide("page-loading");
+  show("page-login");
+  document.getElementById("login-code").focus();
+});
+</script>
+</body>
+</html>
